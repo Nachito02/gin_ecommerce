@@ -6,6 +6,8 @@ import { Menu, X, Search, User, ShoppingCart } from "lucide-react";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <header className="flex text-white justify-between items-center gap-5 px-9 py-4 bg-[#1f1f1f] shadow-md relative">
@@ -30,15 +32,28 @@ export default function Header() {
         <Link href="/carrito">Carrito</Link>
       </nav>
 
-      <div className="hidden md:flex gap-4">
-        <Search size={28} />
+      <div className="hidden md:flex gap-4 items-center">
+        {/* Campo de búsqueda que aparece al lado de la lupa */}
+        {searchOpen && (
+          <input
+            type="text"
+            placeholder="Buscar..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="text-white px-2 py-1 rounded transition-all duration-300 w-48"
+            autoFocus
+          />
+        )}
+        <button onClick={() => setSearchOpen(!searchOpen)}>
+          <Search size={28} />
+        </button>
         <User size={28} />
         <ShoppingCart size={28} />
       </div>
 
       {/* Menú móvil desplegable */}
       <nav
-        className={`absolute top-16 left-0 w-full bg-[#1f1f1f] shadow-md  flex flex-col items-center gap-4 p-4 transition-all duration-300 md:hidden z-10 ${
+        className={`absolute top-16 left-0 w-full bg-[#1f1f1f] shadow-md flex flex-col items-center gap-4 p-4 transition-all duration-300 md:hidden z-10 ${
           menuOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
       >
