@@ -5,16 +5,12 @@ import HeroSection from "@/components/HeroSection";
 import ProductList from "@/components/ProductList";
 import { Product } from "@/models/Product";
 
-export const dynamic = "force-dynamic"; // asegura que sea SSR en entornos con cache
 
-export default async function Home() {
-  const res = await fetch("https://dummyjson.com/products?limit=8", {
-    next: { revalidate: 0 }, // siempre SSR (sin cache)
-  });
+import ProductData from "../public/data/base_de_datos.json";
 
-  const data = await res.json();
+export default function Home() {
 
-  const products: Product[] = data.products.map((product: Product) => ({
+  const products: Product[] = ProductData.map((product: Product) => ({
     id: product.id,
     title: product.title,
     images: product.images,

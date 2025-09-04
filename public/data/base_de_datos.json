@@ -1,0 +1,16 @@
+[
+
+{
+    "id": 1,
+    "title": "Silla de oficina ergonómica",
+    "images": ["public/images/img1.jpg"],
+    "price": 120.50,
+    "rating": 4.5,
+    "thumbnail": "/public/images/img4.jpg",
+    "description": "Silla ergonómica para oficina, ajustable y cómoda.",
+    "category": "Silla",
+    "brand": "OfiMuebles",
+    "stock": 50,
+    "discountPercentage": 10
+    }
+]
