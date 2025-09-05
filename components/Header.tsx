@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, Search, User, ShoppingCart, Award } from "lucide-react";
-import SignIn from "./Sign-In";
-import useLoginModal from "@/hooks/useModal";
+import useLoginModal from "@/hooks/useLoginModal";
 export default function Header() {
 
   const [menuOpen, setMenuOpen] = useState(false);
