@@ -2,12 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Search, User, ShoppingCart } from "lucide-react";
-
+import { Menu, X, Search, User, ShoppingCart, Award } from "lucide-react";
+import SignIn from "./Sign-In";
+import useLoginModal from "@/hooks/useModal";
 export default function Header() {
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const loginModal = useLoginModal();
+
 
   return (
     <header className="flex text-white justify-between items-center gap-5 px-9 py-4 bg-[#1f1f1f] shadow-md relative">
@@ -30,6 +35,7 @@ export default function Header() {
         <Link href="/categorias/mesas">Mesas</Link>
         <Link href="/categorias/camas">Camas</Link>
         <Link href="/carrito">Carrito</Link>
+       {/* <SignIn /> */}
       </nav>
 
       <div className="hidden md:flex gap-4 items-center">
@@ -47,7 +53,7 @@ export default function Header() {
         <button onClick={() => setSearchOpen(!searchOpen)}>
           <Search size={28} />
         </button>
-        <User size={28} />
+        <User size={28} onClick={() => loginModal.onOpen()} />
         <ShoppingCart size={28} />
       </div>
 
@@ -69,6 +75,7 @@ export default function Header() {
         <Link href="/carrito" onClick={() => setMenuOpen(false)}>
           Carrito
         </Link>
+
       </nav>
     </header>
   );

@@ -4,6 +4,7 @@ import "./globals.css";
 import WhatsappButton from "@/components/WhatsappButton";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import LoginModal from "@/components/modals/LoginModal";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,11 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
+      <body suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
 
         <Header />
+        <LoginModal />
         {children}
    
         <WhatsappButton />
