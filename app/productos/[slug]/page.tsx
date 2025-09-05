@@ -44,13 +44,13 @@ export default async function ProductPage(props: { params: Promise<{ slug: strin
 
   return (
     <div className="container mx-auto pt-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 px-4 font-karla">
+      <div className="grid grid-cols-1 md:grid-cols-2 px-4 font-karla ">
         {/* Imagen principal y miniaturas */}
         <div>
           <img
             src={product.thumbnail}
             alt={`Imagen principal de ${product.title}`}
-            className="mb-2 w-1/2 place-self-center"
+            className="mb-2  place-self-center w-full "
           />
           <div className="flex space-x-1 items-center">
             {product.images?.map((_img) => (

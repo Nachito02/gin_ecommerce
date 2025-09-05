@@ -21,7 +21,7 @@ const ProductCard: FC<Product> = ({
           <img
             src={thumbnail}
             alt={title}
-            className="inline-block h-60 transition-transform duration-200 hover:scale-110"
+            className="inline-block  transition-transform duration-200 hover:scale-110 w-full h-full "
           />
         </Link>
       </div>
