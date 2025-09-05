@@ -1,3 +1,4 @@
+"use client";
 import { Product } from "@/models/Product";
 import RatingStar from "@/components/RatingStart";
 import PriceSection from "@/components/PriceSection";
@@ -5,35 +6,23 @@ import { AiOutlineShoppingCart } from "react-icons/ai";
 import { FaHandHoldingDollar } from "react-icons/fa6";
 import { MdFavoriteBorder } from "react-icons/md";
 import ProductList from "@/components/ProductList";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 
 // Importamos el JSON directamente (asegurate que esté en app/data/)
 import data from "@/app/data/base_de_datos.json";
+import { useState } from "react";
+import Button from "@/components/Button";
 
-// SEO dinámico
-export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
-  const { slug } = await props.params;
+export default function ProductPage(props: { params: { slug: string } }) {
+  const { slug } = props.params;
 
-  const product = (data as Product[]).find(
-    (p) => String(p.id) === String(slug)
-  );
-
-  if (!product) {
-    return { title: "Producto no encontrado", description: "" };
-  }
-
-  return {
-    title: product.title,
-    description: product.description ?? "",
-  };
-}
-
-export default async function ProductPage(props: { params: Promise<{ slug: string }> }) {
-  const { slug } = await props.params;
+  const router = useRouter();
 
   const product = (data as Product[]).find(
     (p) => String(p.id) === String(slug)
   );
+
+  const [image, setImage] = useState(product?.thumbnail);
 
   if (!product) return notFound();
 
@@ -42,89 +31,95 @@ export default async function ProductPage(props: { params: Promise<{ slug: strin
     (p) => p.category === product.category && p.id !== product.id
   );
 
+  const handleChangeImage = (img: string) => {
+    setImage(img);
+    return;
+  };
+
   return (
     <div className="container mx-auto pt-8">
       <div className="grid grid-cols-1 md:grid-cols-2 px-4 font-karla ">
         {/* Imagen principal y miniaturas */}
-        <div>
+        <div className="flex flex-col gap-2 mr-10">
           <img
-            src={product.thumbnail}
+            src={image}
             alt={`Imagen principal de ${product.title}`}
-            className="mb-2  place-self-center w-full "
+            className="mb-2  place-self-center w-full max-h-[800px] object-contain"
           />
-          <div className="flex space-x-1 items-center">
+          <div className="flex space-x-1 items-center justify-center mr-10">
             {product.images?.map((_img) => (
               <img
+                onClick={() => handleChangeImage(_img)}
                 key={_img}
                 src={_img}
                 alt={`Miniatura de ${product.title}`}
-                className="w-12 cursor-pointer hover:border-2 hover:border-black"
+                className="w-12 cursor-pointer hover:border-2 hover:border-black max-h-[800px] object-contain"
               />
             ))}
           </div>
         </div>
 
         {/* Información del producto */}
-        <div className="px-2">
-          <h2 className="text-2xl">{product.title}</h2>
-          {product.rating && <RatingStar rating={product.rating} />}
-          <div className="mt-1">
-            <PriceSection
-              discountPercentage={product.discountPercentage ?? 0}
-              price={product.price}
-            />
-          </div>
+        <div className="px-2  flex justify-center ">
+          <div>
+            <h2 className="md:text-6xl text-5xl mt-10">{product.title}</h2>
+            {product.rating && (
+              <div className="mt-2">
+                {" "}
+                <RatingStar rating={product.rating} />
+              </div>
+            )}
+            <div className="mt-2">
+              <PriceSection
+                discountPercentage={product.discountPercentage ?? 0}
+                price={product.price}
+              />
+            </div>
 
-          {/* Tabla de detalles */}
-          <table className="mt-2">
-            <tbody>
-              <tr>
-                <td className="pr-2 font-bold">Marca</td>
-                <td>{product.brand}</td>
-              </tr>
-              <tr>
-                <td className="pr-2 font-bold">Categoría</td>
-                <td>{product.category}</td>
-              </tr>
-              <tr>
-                <td className="pr-2 font-bold">Stock</td>
-                <td>{product.stock}</td>
-              </tr>
-            </tbody>
-          </table>
+            {/* Tabla de detalles */}
+            <table className="mt-2">
+              <tbody>
+                <tr>
+                  <td className="pr-2 text-xl font-bold">Marca</td>
+                  <td className="text-xl">{product.brand}</td>
+                </tr>
+                <tr>
+                  <td className="pr-2 text-xl font-bold">Categoría</td>
+                  <td className="text-xl">{product.category}</td>
+                </tr>
+                <tr>
+                  <td className="pr-2 text-xl font-bold">Stock</td>
+                  <td className="text-xl">{product.stock}</td>
+                </tr>
+              </tbody>
+            </table>
 
-          {/* Descripción */}
-          <div className="mt-2">
-            <h2 className="font-bold">Descripción del producto</h2>
-            <p className="leading-5">{product.description}</p>
-          </div>
+            {/* Descripción */}
+            <div className="mt-2">
+              <h2 className=" text-xl">Descripción del producto</h2>
+              <p className=" text-2xl mt-2">
+                {product.description} Lorem ipsum dolor sit amet consectetur
+                adipisicing elit. Explicabo, fuga! Omnis dolore similique eum
+                consectetur, dicta dignissimos quis debitis eaque excepturi
+                rerum voluptate quo id, reprehenderit beatae nobis ut? Commodi.{" "}
+              </p>
+            </div>
 
-          {/* Botones de acción */}
-          <div className="flex flex-wrap items-center mt-4 mb-2">
-            <button
-              type="button"
-              className="flex space-x-1 items-center mr-2 mb-2 hover:bg-pink-700 text-white py-2 px-4 rounded bg-pink-500"
-              title="Agregar al carrito"
-            >
-              <AiOutlineShoppingCart />
-              <span>Agregar</span>
-            </button>
-            <button
-              type="button"
-              className="flex space-x-1 items-center mr-2 mb-2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-              title="Comprar ahora"
-            >
-              <FaHandHoldingDollar />
-              <span>Comprar</span>
-            </button>
-            <button
-              type="button"
-              className="flex space-x-1 items-center mb-2 bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-700"
-              title="Agregar a favoritos"
-            >
-              <MdFavoriteBorder />
-              <span>Favoritos</span>
-            </button>
+            {/* Botones de acción */}
+          
+            <div className="lg:flex  items-center mt-4 mb-2">
+              <Button
+                label="Agregar al carrito"
+                onClick={() => router.push("/cart")}
+                icon={AiOutlineShoppingCart}
+              />
+
+              <Button
+                label="Favoritos"
+                onClick={() => router.push("/favs")}
+                icon={MdFavoriteBorder}
+              />
+            </div>
           </div>
         </div>
       </div>

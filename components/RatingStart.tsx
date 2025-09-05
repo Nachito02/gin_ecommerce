@@ -9,39 +9,39 @@ const RatingStar: FC<{ rating: number }> = ({ rating }) => {
 
   let showing: any;
   if (main === 1) {
-    showing = <AiFillStar />;
+    showing = <AiFillStar size={30} />;
   } else if (main === 2) {
     showing = (
       <>
-        <AiFillStar />
-        <AiFillStar />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
       </>
     );
   } else if (main === 3) {
     showing = (
       <>
-        <AiFillStar />
-        <AiFillStar />
-        <AiFillStar />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
       </>
     );
   } else if (main === 4) {
     showing = (
       <>
-        <AiFillStar />
-        <AiFillStar />
-        <AiFillStar />
-        <AiFillStar />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
       </>
     );
   } else if (main === 5) {
     showing = (
       <>
-        <AiFillStar />
-        <AiFillStar />
-        <AiFillStar />
-        <AiFillStar />
-        <AiFillStar />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
+        <AiFillStar size={30} />
       </>
     );
   } else {

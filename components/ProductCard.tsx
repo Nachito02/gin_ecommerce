@@ -29,7 +29,7 @@ const ProductCard: FC<Product> = ({
         <p className="text-gray-500 text-[14px] font-medium ">{category}</p>
         <Link
           className="font-semibold hover:underline  overflow-hidden text-ellipsis whitespace-nowrap block"
-          href={{ pathname: `/product/${id}` }}
+          href={{ pathname: `/productos/${id}` }}
           title={title}
         >
           {title}

@@ -12,7 +12,6 @@ const Button: React.FC<ButtonProps> = ({
   label,
   onClick,
   disabled,
-  icon,
   outline,
   small,
   icon: Icon,
