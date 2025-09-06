@@ -4,6 +4,7 @@ import Link from "next/link";
 import RatingStar from "./RatingStart";
 import PriceSection from "./PriceSection";
 import { AiOutlineShoppingCart } from "react-icons/ai";
+import useCarritoStore from "@/hooks/useCarritoStore";
 
 const ProductCard: FC<Product> = ({
   id,
@@ -13,7 +14,7 @@ const ProductCard: FC<Product> = ({
   category,
   rating,
   discountPercentage,
-}) => {
+}) => {const agregarProducto = useCarritoStore((state) => state.agregarProducto);
   return (
     <div className="border border-gray-200 font-lato" data-test="product-card">
       <div className="text-center border-b border-gray-200">
@@ -43,14 +44,21 @@ const ProductCard: FC<Product> = ({
           <PriceSection discountPercentage={discountPercentage} price={price} />
         )}
         <button
-          type="button"
-          className="flex items-center space-x-2 hover:bg-blue-500 text-white py-2 px-4 rounded bg-[#1f1f1f]"
-          onClick={(addCart) => console.log(addCart)}
-          data-test="add-cart-btn"
-          title="ADD TO CART"
-        >
-          <AiOutlineShoppingCart />
-        </button>
+  type="button"
+  className="flex items-center space-x-2 hover:bg-blue-500 text-white py-2 px-4 rounded bg-[#1f1f1f]"
+  onClick={() =>
+agregarProducto({
+  id,
+  title,
+  price: `$${price}`, 
+  thumbnail,
+})
+  }
+  data-test="add-cart-btn"
+  title="ADD TO CART"
+>
+  <AiOutlineShoppingCart />
+</button>
       </div>
     </div>
   );

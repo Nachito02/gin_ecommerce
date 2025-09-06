@@ -1,29 +1,31 @@
 "use client";
+
+import { useParams } from "next/navigation"; // Importa useParams
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Product } from "@/models/Product";
 import RatingStar from "@/components/RatingStart";
 import PriceSection from "@/components/PriceSection";
 import { AiOutlineShoppingCart } from "react-icons/ai";
-import { FaHandHoldingDollar } from "react-icons/fa6";
 import { MdFavoriteBorder } from "react-icons/md";
 import ProductList from "@/components/ProductList";
-import { notFound, useRouter } from "next/navigation";
-
-// Importamos el JSON directamente (asegurate que esté en app/data/)
-import data from "@/app/data/base_de_datos.json";
-import { useState } from "react";
 import Button from "@/components/Button";
+import useCarritoStore from "@/hooks/useCarritoStore";
+import { notFound } from "next/navigation";
+import data from "@/app/data/base_de_datos.json";
 
-export default function ProductPage(props: { params: { slug: string } }) {
-  const { slug } = props.params;
-
+export default function ProductPage() {
+  // Usar useParams para acceder a los parámetros de la URL
+  const params = useParams();
+  const { slug } = params;
   const router = useRouter();
+  const agregarProducto = useCarritoStore((state) => state.agregarProducto);
 
-  const product = (data as Product[]).find(
-    (p) => String(p.id) === String(slug)
-  );
-
+  // Buscar el producto por el slug
+  const product = (data as Product[]).find((p) => String(p.id) === String(slug));
   const [image, setImage] = useState(product?.thumbnail);
 
+  // Si no se encuentra el producto, redirigir a una página 404
   if (!product) return notFound();
 
   // Filtrar productos similares
@@ -31,28 +33,26 @@ export default function ProductPage(props: { params: { slug: string } }) {
     (p) => p.category === product.category && p.id !== product.id
   );
 
-  const handleChangeImage = (img: string) => {
-    setImage(img);
-    return;
-  };
+  // Cambiar imagen cuando se haga clic en la miniatura
+  const handleChangeImage = (img: string) => setImage(img);
 
   return (
     <div className="container mx-auto pt-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 px-4 font-karla ">
+      <div className="grid grid-cols-1 md:grid-cols-2 px-4 font-karla">
         {/* Imagen principal y miniaturas */}
         <div className="flex flex-col gap-2 mr-10">
           <img
             src={image}
             alt={`Imagen principal de ${product.title}`}
-            className="mb-2  place-self-center w-full max-h-[800px] object-contain"
+            className="mb-2 place-self-center w-full max-h-[800px] object-contain"
           />
           <div className="flex space-x-1 items-center justify-center mr-10">
-            {product.images?.map((_img) => (
+            {product.images?.map((img) => (
               <img
-                onClick={() => handleChangeImage(_img)}
-                key={_img}
-                src={_img}
+                key={img}
+                src={img}
                 alt={`Miniatura de ${product.title}`}
+                onClick={() => handleChangeImage(img)}
                 className="w-12 cursor-pointer hover:border-2 hover:border-black max-h-[800px] object-contain"
               />
             ))}
@@ -60,12 +60,11 @@ export default function ProductPage(props: { params: { slug: string } }) {
         </div>
 
         {/* Información del producto */}
-        <div className="px-2  flex justify-center ">
+        <div className="px-2 flex justify-center">
           <div>
             <h2 className="md:text-6xl text-5xl mt-10">{product.title}</h2>
             {product.rating && (
               <div className="mt-2">
-                {" "}
                 <RatingStar rating={product.rating} />
               </div>
             )}
@@ -96,21 +95,32 @@ export default function ProductPage(props: { params: { slug: string } }) {
 
             {/* Descripción */}
             <div className="mt-2">
-              <h2 className=" text-xl">Descripción del producto</h2>
-              <p className=" text-2xl mt-2">
-                {product.description} Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Explicabo, fuga! Omnis dolore similique eum
-                consectetur, dicta dignissimos quis debitis eaque excepturi
-                rerum voluptate quo id, reprehenderit beatae nobis ut? Commodi.{" "}
-              </p>
+              <h2 className="text-xl">Descripción del producto</h2>
+              <p className="text-2xl mt-2">{product.description}</p>
             </div>
 
             {/* Botones de acción */}
-          
-            <div className="lg:flex  items-center mt-4 mb-2">
+            <div className="lg:flex items-center mt-4 mb-2 space-x-4">
               <Button
                 label="Agregar al carrito"
-                onClick={() => router.push("/cart")}
+                onClick={() => {
+                  // Agregar producto al carrito
+                  agregarProducto({
+                    id: product.id,
+                    title: product.title,
+                    price: `$${product.price.toLocaleString("es-AR")}`,
+                    thumbnail: product.thumbnail,
+                  });
+
+                  // Imprimir en consola detalles del producto agregado
+                  console.log("Producto agregado:", {
+                    id: product.id,
+                    title: product.title,
+                    price: product.price,
+                    thumbnail: product.thumbnail,
+                  });
+                  console.log("Carrito actual:", useCarritoStore.getState().productos);
+                }}
                 icon={AiOutlineShoppingCart}
               />
 

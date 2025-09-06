@@ -1,17 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Search, User, ShoppingCart, Award } from "lucide-react";
+import { Menu, X, Search, User, ShoppingCart } from "lucide-react";
 import useLoginModal from "@/hooks/useLoginModal";
-export default function Header() {
+import useCarritoStore from "@/hooks/useCarritoStore"; // Asegúrate de importar la tienda de carrito
 
+export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const loginModal = useLoginModal();
+  const [visible, setVisible] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el pop-up está abierto
 
+  // Obtener productos desde el carrito
+  const productos = useCarritoStore((state) => state.productos);
+
+  // Referencia para el pop-up del carrito
+  const carritoRef = useRef<HTMLDivElement | null>(null); // Aquí especificamos el tipo
+
+  // Cerrar el pop-up si el usuario hace clic fuera de él
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (carritoRef.current && !carritoRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="flex text-white justify-between items-center gap-5 px-9 py-4 bg-[#1f1f1f] shadow-md relative">
@@ -34,7 +56,6 @@ export default function Header() {
         <Link href="/categorias/mesas">Mesas</Link>
         <Link href="/categorias/camas">Camas</Link>
         <Link href="/carrito">Carrito</Link>
-       {/* <SignIn /> */}
       </nav>
 
       <div className="hidden md:flex gap-4 items-center">
@@ -53,7 +74,52 @@ export default function Header() {
           <Search size={28} />
         </button>
         <User size={28} onClick={() => loginModal.onOpen()} />
-        <ShoppingCart size={28} />
+
+        {/* Carrito flotante */}
+        <div
+          className="relative"
+          onMouseEnter={() => setVisible(true)}
+          onMouseLeave={() => setVisible(false)}
+        >
+          <ShoppingCart
+            size={50}
+            className="cursor-pointer text-white"
+            onClick={() => setIsOpen(!isOpen)} // Al hacer click alternamos el estado isOpen
+          />
+
+          {/* Mostrar pop-up solo si isOpen es true */}
+          {(visible || isOpen) && (
+            <div
+              ref={carritoRef} // Asociamos la referencia al div del carrito
+              className="absolute top-full right-0 mt-2 w-64 bg-[#1f1f1f] text-white shadow-lg border rounded z-10 p-4"
+            >
+              <h3 className="font-bold mb-2">Carrito:</h3>
+              <ul className="space-y-2">
+                {productos.length > 0 ? (
+                  productos.map((item) => (
+                   <li key={item.id} className="flex justify-between items-center text-sm">
+                     <img src={item.thumbnail} alt={item.title} className="w-10 h-10 mr-2" />
+                      <span>{item.title}</span>
+                      <div className="flex items-center gap-3">
+                        <span>{item.price}</span>
+                        <button
+                          className="bg-blue-500 text-white px-2 py-1 rounded "
+                          onClick={() => useCarritoStore.getState().quitarProducto(item.id)}
+                        >
+                          Quitar
+                        </button>
+                      </div>
+                    </li>
+
+                   
+                  ))
+                ) : (
+                  <li className="text-red-500 text-sm">El carrito está vacío</li>
+                )}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Menú móvil desplegable */}
@@ -74,7 +140,6 @@ export default function Header() {
         <Link href="/carrito" onClick={() => setMenuOpen(false)}>
           Carrito
         </Link>
-
       </nav>
     </header>
   );
