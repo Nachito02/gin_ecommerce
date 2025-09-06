@@ -4,7 +4,7 @@ import GoogleProvider from "next-auth/providers/google"
 import clientPromise from "./lib/db"
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+  adapter: MongoDBAdapter(clientPromise, {databaseName: 'gin'}),
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID as string,
@@ -14,5 +14,7 @@ export const authOptions: NextAuthOptions = {
   // Use AUTH_SECRET from your .env for v4 compatibility
   secret: process.env.AUTH_SECRET,
 }
+
+export const {handleres,signIn, signOut,} = NextAuth(authOptions)
 
 export default authOptions

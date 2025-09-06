@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Menu, X, Search, User, ShoppingCart, Award } from "lucide-react";
 import useLoginModal from "@/hooks/useLoginModal";
-export default function Header() {
+import Avatar from "./Avatar";
+
+interface HeaderProps {
+  currentUser : any;
+}
+
+export default function Header({currentUser} : HeaderProps) {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const loginModal = useLoginModal();
+
+
+  console.log(currentUser)
 
 
   return (
@@ -52,7 +61,7 @@ export default function Header() {
         <button onClick={() => setSearchOpen(!searchOpen)}>
           <Search size={28} />
         </button>
-        <User size={28} onClick={() => loginModal.onOpen()} />
+        {!currentUser?.id ? ( <User size={28} onClick={() => loginModal.onOpen()} />) : (<Avatar src={currentUser.image} />)}
         <ShoppingCart size={28} />
       </div>
 
