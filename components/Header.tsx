@@ -6,7 +6,13 @@ import { Menu, X, Search, User, ShoppingCart } from "lucide-react";
 import useLoginModal from "@/hooks/useLoginModal";
 import useCarritoStore from "@/hooks/useCarritoStore"; // Asegúrate de importar la tienda de carrito
 
-export default function Header() {
+import Avatar from "./Avatar";
+
+interface HeaderProps {
+  currentUser : any;
+}
+
+export default function Header({currentUser} : HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -73,7 +79,7 @@ export default function Header() {
         <button onClick={() => setSearchOpen(!searchOpen)}>
           <Search size={28} />
         </button>
-        <User size={28} onClick={() => loginModal.onOpen()} />
+        {!currentUser?.id ? ( <User size={28} onClick={() => loginModal.onOpen()} />) : (<Avatar src={currentUser.image} />)}
 
         {/* Carrito flotante */}
         <div
