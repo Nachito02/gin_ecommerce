@@ -1,17 +1,13 @@
 "use client";
 
 import { useParams } from "next/navigation"; // Importa useParams
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Product } from "@/models/Product";
 import RatingStar from "@/components/RatingStart";
 import PriceSection from "@/components/PriceSection";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { MdFavoriteBorder } from "react-icons/md";
 import ProductList from "@/components/ProductList";
-import Button from "@/components/Button";
 import useCarritoStore from "@/hooks/useCarritoStore";
-import { notFound } from "next/navigation";
 import { notFound, useRouter } from "next/navigation";
 import data from "@/app/data/base_de_datos.json";
 import { useMemo, useState } from "react";
@@ -21,10 +17,7 @@ export default function ProductPage({ params: { slug } }: { params: { slug: stri
   const router = useRouter();
   const agregarProducto = useCarritoStore((state) => state.agregarProducto);
 
-  // Buscar el producto por el slug
-  const product = (data as Product[]).find((p) => String(p.id) === String(slug));
-  const [image, setImage] = useState(product?.thumbnail);
-
+  
   // Si no se encuentra el producto, redirigir a una página 404
 
   const product = useMemo(
@@ -174,7 +167,7 @@ export default function ProductPage({ params: { slug } }: { params: { slug: stri
                 />
                 <Button
                   label="Agregar al carrito"
-                  onClick={() => router.push("/cart")}
+                  onClick={() =>agregarProducto(product)}
                   icon={AiOutlineShoppingCart}
                 />
 
