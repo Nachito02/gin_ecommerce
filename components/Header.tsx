@@ -7,6 +7,8 @@ import useLoginModal from "@/hooks/useLoginModal";
 import useCarritoStore from "@/hooks/useCarritoStore"; // Asegúrate de importar la tienda de carrito
 
 import Avatar from "./Avatar";
+import CartButton from "./cart/CartButton";
+import CartDropdown from "./cart/CartDropdown";
 
 interface HeaderProps {
   currentUser : any;
@@ -20,9 +22,10 @@ export default function Header({currentUser} : HeaderProps) {
   const loginModal = useLoginModal();
   const [visible, setVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el pop-up está abierto
+  const [cartOpen, setCartOpen] = useState(false);
 
   // Obtener productos desde el carrito
-  const productos = useCarritoStore((state) => state.productos);
+  const productos = useCarritoStore((state) => state.items);
 
   // Referencia para el pop-up del carrito
   const carritoRef = useRef<HTMLDivElement | null>(null); // Aquí especificamos el tipo
@@ -84,47 +87,9 @@ export default function Header({currentUser} : HeaderProps) {
         {/* Carrito flotante */}
         <div
           className="relative"
-          onMouseEnter={() => setVisible(true)}
-          onMouseLeave={() => setVisible(false)}
         >
-          <ShoppingCart
-            size={50}
-            className="cursor-pointer text-white"
-            onClick={() => setIsOpen(!isOpen)} // Al hacer click alternamos el estado isOpen
-          />
-
-          {/* Mostrar pop-up solo si isOpen es true */}
-          {(visible || isOpen) && (
-            <div
-              ref={carritoRef} // Asociamos la referencia al div del carrito
-              className="absolute top-full right-0 mt-2 w-64 bg-[#1f1f1f] text-white shadow-lg border rounded z-10 p-4"
-            >
-              <h3 className="font-bold mb-2">Carrito:</h3>
-              <ul className="space-y-2">
-                {productos.length > 0 ? (
-                  productos.map((item) => (
-                   <li key={item.id} className="flex justify-between items-center text-sm">
-                     <img src={item.thumbnail} alt={item.title} className="w-10 h-10 mr-2" />
-                      <span>{item.title}</span>
-                      <div className="flex items-center gap-3">
-                        <span>{item.price}</span>
-                        <button
-                          className="bg-blue-500 text-white px-2 py-1 rounded "
-                          onClick={() => useCarritoStore.getState().quitarProducto(item.id)}
-                        >
-                          Quitar
-                        </button>
-                      </div>
-                    </li>
-
-                   
-                  ))
-                ) : (
-                  <li className="text-red-500 text-sm">El carrito está vacío</li>
-                )}
-              </ul>
-            </div>
-          )}
+          <CartButton onClick={() => setCartOpen((o) => !o)} />
+          <CartDropdown open={cartOpen}  onClose={() => setCartOpen(!cartOpen)} />
         </div>
       </div>
 

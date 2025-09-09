@@ -1,6 +1,4 @@
 "use client";
-
-import { useParams } from "next/navigation"; // Importa useParams
 import { Product } from "@/models/Product";
 import RatingStar from "@/components/RatingStart";
 import PriceSection from "@/components/PriceSection";
@@ -15,7 +13,7 @@ import Button from "@/components/Button";
 
 export default function ProductPage({ params: { slug } }: { params: { slug: string } }) {
   const router = useRouter();
-  const agregarProducto = useCarritoStore((state) => state.agregarProducto);
+  const addItem = useCarritoStore((state) => state.addItem);
 
   
   // Si no se encuentra el producto, redirigir a una página 404
@@ -167,7 +165,7 @@ export default function ProductPage({ params: { slug } }: { params: { slug: stri
                 />
                 <Button
                   label="Agregar al carrito"
-                  onClick={() =>agregarProducto(product)}
+                  onClick={() =>addItem(product)}
                   icon={AiOutlineShoppingCart}
                 />
 
