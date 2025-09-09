@@ -21,7 +21,7 @@ const ProductCard: FC<Product> = ({
           <img
             src={thumbnail}
             alt={title}
-            className="inline-block h-60 transition-transform duration-200 hover:scale-110"
+            className="inline-block  transition-transform duration-200 hover:scale-110 w-full h-full "
           />
         </Link>
       </div>
@@ -29,7 +29,7 @@ const ProductCard: FC<Product> = ({
         <p className="text-gray-500 text-[14px] font-medium ">{category}</p>
         <Link
           className="font-semibold hover:underline  overflow-hidden text-ellipsis whitespace-nowrap block"
-          href={{ pathname: `/product/${id}` }}
+          href={{ pathname: `/productos/${id}` }}
           title={title}
         >
           {title}

@@ -6,7 +6,7 @@ import ProductList from "@/components/ProductList";
 import { Product } from "@/models/Product";
 
 
-import ProductData from "../public/data/base_de_datos.json";
+import ProductData from "../app/data/base_de_datos.json";
 
 export default function Home() {
 
