@@ -1,14 +1,214 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mongodb"
-  url      = env("MONGODB_URI")
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  email          String?         @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  accounts       Account[]
+  sessions       Session[]
+  Authenticator  Authenticator[]
+
+  // ⬇️ Campo inverso para la relación con Review
+  reviews Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @id @map("_id")
+  userId               String  @db.ObjectId
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, credentialID])
+}
+
+// =========================
+// ECOMMERCE: MUEBLES
+// =========================
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Category {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String  @unique
+  description String?
+  iconUrl     String?
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relación M-N con Product a través de ProductCategory
+  productLinks ProductCategory[]
+}
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String   @unique
+  sku         String?  @unique // SKU general (además de los de variantes)
+  description String?
+  // Atributos generales (muebles): materiales, estilo, ambiente, etc.
+  materials   String[] // ej: ["madera maciza", "metal", "tapizado"]
+  styleTags   String[] // ej: ["moderno", "nórdico", "industrial"]
+  roomTags    String[] // ej: ["living", "comedor", "dormitorio"]
+  brandId     String?  @db.ObjectId
+
+  // Medidas/peso (del producto base)
+  widthCm     Float?
+  depthCm     Float?
+  heightCm    Float?
+  weightKg    Float?
+  // Estado
+  status      ProductStatus     @default(DRAFT)
+  featured    Boolean           @default(false)
+  publishedAt DateTime?
+  // Media
+  images      String[] // URLs de imágenes (1ra como principal)
+  // Relación categorías
+  categories  ProductCategory[]
+  // Variantes (color, tamaño, terminación, etc.)
+  variants    ProductVariant[]
+  // Reseñas
+  reviews     Review[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([status])
+  @@index([featured])
+}
+
+model ProductVariant {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+
+  // Opciones típicas de muebles
+  color     String? // "Roble", "Blanco", "Negro", etc.
+  finish    String? // "Mate", "Brillante", "Laqueado"
+  sizeLabel String? // "S", "M", "L", "160x90", etc.
+  material  String? // Si difiere del producto base
+
+  // Precio / stock
+  priceCents          Int // precio final (en centavos)
+  compareAtPriceCents Int? // precio tachado / anterior (en centavos)
+  inStock             Int  @default(0) // unidades disponibles
+  lowStockThreshold   Int? // para alertas, ej. 5
+
+  // Dimensiones específicas de la variante (si cambian)
+  widthCm  Float?
+  depthCm  Float?
+  heightCm Float?
+  weightKg Float?
+
+  // Media específica de la variante
+  images String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model ProductCategory {
+  // Tabla puente para M-N (requerida en Mongo)
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  productId  String @db.ObjectId
+  categoryId String @db.ObjectId
+
+  product  Product  @relation(fields: [productId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([productId, categoryId])
+  @@index([categoryId])
+  @@index([productId])
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId String   @db.ObjectId
+  userId    String   @db.ObjectId
+  rating    Int // 1..5
+  title     String?
+  comment   String?
+  images    String[] // fotos del cliente opcionales
+
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
+  @@index([rating])
 }

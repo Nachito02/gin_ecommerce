@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/modals/LoginModal";
 import RegisterModal from "@/components/modals/RegisterModal";
-import { getCurrentUser } from "./actions/gerCurrentUser";
+import { getCurrentUser } from "./actions/getCurrentUser";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

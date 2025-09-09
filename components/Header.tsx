@@ -19,7 +19,6 @@ export default function Header({currentUser} : HeaderProps) {
   const loginModal = useLoginModal();
 
 
-  console.log(currentUser)
 
 
   return (
