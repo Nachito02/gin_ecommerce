@@ -1,15 +1,11 @@
+import { Product } from "@/models/Product";
 import { create } from "zustand";
 
-type Producto = {
-  id: number;
-  title: string;
-  price: string;
-  thumbnail?: string;
-};
+
 
 type CarritoState = {
-  productos: Producto[];
-  agregarProducto: (producto: Producto) => void;
+  productos: Product[];
+  agregarProducto: (producto: Product) => void;
   quitarProducto: (id: number) => void;
   limpiarCarrito: () => void;
 };
