@@ -16,7 +16,7 @@ const ProductCard: FC<Product> = memo(function ProductCard({
   discountPercentage,
 }) {
   const hasDiscount = typeof discountPercentage === "number" && discountPercentage > 0;
-const agregarProducto = useCarritoStore((state) => state.agregarProducto);
+// const agregarProducto = useCarritoStore((state) => state.agregarProducto);
   return (
     <article
       className="group relative rounded-2xl bg-white ring-1 ring-neutral-200/60 shadow-sm hover:shadow-md transition-shadow font-lato"
