@@ -35,7 +35,7 @@ const LoginModal = () => {
         signIn("credentials", {
             ...data,
             redirect: false,
-        }).then((callback) => {
+        }).then((callback : any) => {
             setIsLoading(false);
 
             if (callback?.ok) {

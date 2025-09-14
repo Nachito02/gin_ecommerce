@@ -112,16 +112,18 @@ model Category {
 }
 
 model Product {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  slug        String   @unique
-  sku         String?  @unique // SKU general (además de los de variantes)
-  description String?
+  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
+  title              String
+  slug               String  @unique
+  description        String?
+  price              Float
+  discountPercentage Int     @default(0) // <— NUEVO
+  stock              Int
+
   // Atributos generales (muebles): materiales, estilo, ambiente, etc.
-  materials   String[] // ej: ["madera maciza", "metal", "tapizado"]
-  styleTags   String[] // ej: ["moderno", "nórdico", "industrial"]
-  roomTags    String[] // ej: ["living", "comedor", "dormitorio"]
-  brandId     String?  @db.ObjectId
+  materials String[] // ej: ["madera maciza", "metal", "tapizado"]
+  styleTags String[] // ej: ["moderno", "nórdico", "industrial"]
+  roomTags  String[] // ej: ["living", "comedor", "dormitorio"]
 
   // Medidas/peso (del producto base)
   widthCm     Float?

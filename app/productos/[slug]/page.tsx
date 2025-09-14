@@ -1,133 +1,110 @@
-"use client";
-import { Product } from "@/models/Product";
-import RatingStar from "@/components/RatingStart";
-import PriceSection from "@/components/PriceSection";
-import { AiOutlineShoppingCart } from "react-icons/ai";
-import { FaHandHoldingDollar } from "react-icons/fa6";
-import { MdFavoriteBorder } from "react-icons/md";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { getProduct } from "@/app/actions/getProduct";
 import ProductList from "@/components/ProductList";
-import { notFound, useRouter } from "next/navigation";
+import ImageGalleryClient from "./ImageGalleryClient";
+import BuyBoxClient from "./BuyBoxClient";
+import { getSimilarProducts } from "@/app/actions/getSimiliarProducts";
+import PriceSection from "@/components/PriceSection";
 
-// Importamos el JSON directamente (asegurate que esté en app/data/)
-import data from "@/app/data/base_de_datos.json";
-import { useState } from "react";
-import Button from "@/components/Button";
 
-export default function ProductPage(props: { params: { slug: string } }) {
-  const { slug } = props.params;
+type Params = Promise<{ slug: string }>
 
-  const router = useRouter();
 
-  const product = (data as Product[]).find(
-    (p) => String(p.id) === String(slug)
-  );
+export default async function ProductPage(props: {params:Params}) {
 
-  const [image, setImage] = useState(product?.thumbnail);
+  const { slug } = await  props.params;
 
+  const product = await getProduct(slug);
   if (!product) return notFound();
 
-  // Filtrar productos similares
-  const similar = (data as Product[]).filter(
-    (p) => p.category === product.category && p.id !== product.id
+  const similar = await getSimilarProducts(
+    product.id,
+    product.categories?.map((c) => c.slug) ?? []
   );
 
-  const handleChangeImage = (img: string) => {
-    setImage(img);
-    return;
-  };
+  // La imagen principal la maneja el client component
+  const thumbnails = product.images;
 
   return (
-    <div className="container mx-auto pt-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 px-4 font-karla ">
-        {/* Imagen principal y miniaturas */}
-        <div className="flex flex-col gap-2 mr-10">
-          <img
-            src={image}
-            alt={`Imagen principal de ${product.title}`}
-            className="mb-2  place-self-center w-full max-h-[800px] object-contain"
-          />
-          <div className="flex space-x-1 items-center justify-center mr-10">
-            {product.images?.map((_img) => (
-              <img
-                onClick={() => handleChangeImage(_img)}
-                key={_img}
-                src={_img}
-                alt={`Miniatura de ${product.title}`}
-                className="w-12 cursor-pointer hover:border-2 hover:border-black max-h-[800px] object-contain"
-              />
-            ))}
-          </div>
-        </div>
+    <div className="container mx-auto px-4 pb-28 md:pb-10 pt-6 font-karla">
+      {/* Migas de pan (usar Link en server está OK) */}
+      <nav className="text-sm text-neutral-500 mb-3">
+        <Link className="hover:underline" href="/">Inicio</Link>
+        <span className="mx-2">/</span>
+        {product.categories?.[0] ? (
+          <Link className="hover:underline" href={`/c/${product.categories[0].slug}`}>
+            {product.categories[0].name}
+          </Link>
+        ) : (
+          <span className="text-neutral-700">Sin categoría</span>
+        )}
+        <span className="mx-2">/</span>
+        <span className="text-neutral-700">{product.title}</span>
+      </nav>
 
-        {/* Información del producto */}
-        <div className="px-2  flex justify-center ">
-          <div>
-            <h2 className="md:text-6xl text-5xl mt-10">{product.title}</h2>
-            {product.rating && (
-              <div className="mt-2">
-                {" "}
-                <RatingStar rating={product.rating} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* GALERÍA (Client) */}
+        <section className="lg:col-span-6">
+          <ImageGalleryClient images={thumbnails} title={product.title} />
+        </section>
+
+        {/* DETALLE (Server, sin estados) */}
+        <section className="lg:col-span-3">
+          <div className="rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200/60 p-5">
+            <h1 className="text-2xl md:text-3xl font-semibold text-neutral-900">
+              {product.title}
+            </h1>
+
+            {/* Meta simple */}
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
+              <span className="text-emerald-600 font-medium">Stock: {product.stock} </span>
+            </div>
+
+        
+               <PriceSection price={product.price} discountPercentage={product.discountPercentage ?? 0} /> 
+
+            {/* badges */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {product.categories?.map((c) => (
+                <span key={c.id} className="px-2.5 py-1 rounded-full text-xs bg-neutral-100 text-neutral-700">
+                  {c.name}
+                </span>
+              ))}
+            </div>
+
+            {/* descripción */}
+            {!!product.description && (
+              <div className="mt-5">
+                <h2 className="text-base font-semibold text-neutral-900">Descripción</h2>
+                <p className="mt-1 text-neutral-700 leading-relaxed">{product.description}</p>
               </div>
             )}
-            <div className="mt-2">
-              <PriceSection
-                discountPercentage={product.discountPercentage ?? 0}
-                price={product.price}
-              />
-            </div>
 
-            {/* Tabla de detalles */}
-            <table className="mt-2">
-              <tbody>
-                <tr>
-                  <td className="pr-2 text-xl font-bold">Marca</td>
-                  <td className="text-xl">{product.brand}</td>
-                </tr>
-                <tr>
-                  <td className="pr-2 text-xl font-bold">Categoría</td>
-                  <td className="text-xl">{product.category}</td>
-                </tr>
-                <tr>
-                  <td className="pr-2 text-xl font-bold">Stock</td>
-                  <td className="text-xl">{product.stock}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            {/* Descripción */}
-            <div className="mt-2">
-              <h2 className=" text-xl">Descripción del producto</h2>
-              <p className=" text-2xl mt-2">
-                {product.description} Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Explicabo, fuga! Omnis dolore similique eum
-                consectetur, dicta dignissimos quis debitis eaque excepturi
-                rerum voluptate quo id, reprehenderit beatae nobis ut? Commodi.{" "}
-              </p>
-            </div>
-
-            {/* Botones de acción */}
-          
-            <div className="lg:flex  items-center mt-4 mb-2">
-              <Button
-                label="Agregar al carrito"
-                onClick={() => router.push("/cart")}
-                icon={AiOutlineShoppingCart}
-              />
-
-              <Button
-                label="Favoritos"
-                onClick={() => router.push("/favs")}
-                icon={MdFavoriteBorder}
-              />
+            {/* tabla de detalles (ejemplo con medidas) */}
+            <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+              <div className="text-neutral-500">Ancho</div>
+              <div className="text-neutral-800">{product.widthCm ?? "-"}</div>
+              <div className="text-neutral-500">Profundidad</div>
+              <div className="text-neutral-800">{product.depthCm ?? "-"}</div>
+              <div className="text-neutral-500">Alto</div>
+              <div className="text-neutral-800">{product.heightCm ?? "-"}</div>
+              <div className="text-neutral-500">Peso</div>
+              <div className="text-neutral-800">{product.weightKg ?? "-"}</div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* BOX DE COMPRA (Client: router + store) */}
+        <aside className="lg:col-span-3">
+          <BuyBoxClient product={product} />
+        </aside>
       </div>
 
-      {/* Productos similares */}
-      <hr className="mt-4" />
-      <ProductList title="Productos similares" products={similar} />
-      <br />
+      {/* SIMILARES */}
+      <div className="mt-8">
+        <ProductList title="Productos similares" products={similar} />
+      </div>
     </div>
   );
 }

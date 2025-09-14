@@ -7,6 +7,10 @@ import Footer from "@/components/Footer";
 import LoginModal from "@/components/modals/LoginModal";
 import RegisterModal from "@/components/modals/RegisterModal";
 import { getCurrentUser } from "./actions/getCurrentUser";
+
+export const dynamic = 'force-dynamic'
+
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -41,6 +45,7 @@ export default async function RootLayout({
         <RegisterModal />
         {children}
    
+
         <WhatsappButton />
        <Footer />
 

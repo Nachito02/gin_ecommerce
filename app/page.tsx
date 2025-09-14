@@ -5,22 +5,13 @@ import HeroSection from "@/components/HeroSection";
 import ProductList from "@/components/ProductList";
 import { Product } from "@/models/Product";
 
+import { getProducts } from "./actions/getProducts";
 
-import ProductData from "../app/data/base_de_datos.json";
+export default async function Home() {
 
-export default function Home() {
+  const products: Product[] = await getProducts() 
 
-  const products: Product[] = ProductData.map((product: Product) => ({
-    id: product.id,
-    title: product.title,
-    images: product.images,
-    price: product.price,
-    rating: product.rating,
-    thumbnail: product.thumbnail,
-    description: product.description,
-    category: product.category,
-    discountPercentage: product.discountPercentage,
-  }));
+  console.log(products)
 
   return (
     <div className="font-sans">
@@ -28,7 +19,6 @@ export default function Home() {
       <Features />
       <ProductList title="Productos destacados" products={products} />
       <Banner />
-      <ProductList title="Productos destacados" products={products} />
 
     </div>
   );

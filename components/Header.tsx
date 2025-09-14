@@ -1,25 +1,48 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Search, User, ShoppingCart, Award } from "lucide-react";
+import { Menu, X, Search, User, ShoppingCart } from "lucide-react";
 import useLoginModal from "@/hooks/useLoginModal";
+import useCarritoStore from "@/hooks/useCarritoStore"; // Asegúrate de importar la tienda de carrito
+
 import Avatar from "./Avatar";
+import CartButton from "./cart/CartButton";
+import CartDropdown from "./cart/CartDropdown";
 
 interface HeaderProps {
   currentUser : any;
 }
 
 export default function Header({currentUser} : HeaderProps) {
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const loginModal = useLoginModal();
+  const [visible, setVisible] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el pop-up está abierto
+  const [cartOpen, setCartOpen] = useState(false);
 
+  // Obtener productos desde el carrito
+  const productos = useCarritoStore((state) => state.items);
 
+  // Referencia para el pop-up del carrito
+  const carritoRef = useRef<HTMLDivElement | null>(null); // Aquí especificamos el tipo
 
+  // Cerrar el pop-up si el usuario hace clic fuera de él
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (carritoRef.current && !carritoRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="flex text-white justify-between items-center gap-5 px-9 py-4 bg-[#1f1f1f] shadow-md relative">
@@ -42,7 +65,6 @@ export default function Header({currentUser} : HeaderProps) {
         <Link href="/categorias/mesas">Mesas</Link>
         <Link href="/categorias/camas">Camas</Link>
         <Link href="/carrito">Carrito</Link>
-       {/* <SignIn /> */}
       </nav>
 
       <div className="hidden md:flex gap-4 items-center">
@@ -61,7 +83,14 @@ export default function Header({currentUser} : HeaderProps) {
           <Search size={28} />
         </button>
         {!currentUser?.id ? ( <User size={28} onClick={() => loginModal.onOpen()} />) : (<Avatar src={currentUser.image} />)}
-        <ShoppingCart size={28} />
+
+        {/* Carrito flotante */}
+        <div
+          className="relative"
+        >
+          <CartButton onClick={() => setCartOpen((o) => !o)} />
+          <CartDropdown open={cartOpen}  onClose={() => setCartOpen(!cartOpen)} />
+        </div>
       </div>
 
       {/* Menú móvil desplegable */}
@@ -82,7 +111,6 @@ export default function Header({currentUser} : HeaderProps) {
         <Link href="/carrito" onClick={() => setMenuOpen(false)}>
           Carrito
         </Link>
-
       </nav>
     </header>
   );

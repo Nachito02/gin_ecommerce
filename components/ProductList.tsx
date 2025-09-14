@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { FC } from "react";
 import { Product } from "../models/Product";
@@ -22,12 +22,14 @@ const ProductList: FC<{ title: string; products: Product[] }> = ({
         <ProductCard
           key={product.id}
           id={product.id}
-          category={product.category}
+          images={product.images}
+          categories={product.categories}
           title={product.title}
           price={product.price}
-          thumbnail={product.thumbnail}
-          rating={product.rating}
           discountPercentage={product.discountPercentage}
+          featured={product.featured}
+          slug={product.slug}
+          status={product.status}
         />
       ))}
     </div>
