@@ -9,13 +9,13 @@ type CartState = {
 
   // actions
   addItem: (product: Product, qty?: number) => void;
-  removeOne: (id: number) => void;        // decrease quantity by 1
-  removeItem: (id: number) => void;       // remove the whole item
-  setItemQuantity: (id: number, qty: number) => void;
+  removeOne: (id: string) => void;        // decrease quantity by 1
+  removeItem: (id: string) => void;       // remove the whole item
+  setItemQuantity: (id: string, qty: number) => void;
   clearCart: () => void;
 
   // selectors (handy for UI)
-  getItemQuantity: (id: number) => number;
+  getItemQuantity: (id: string) => number;
   getTotalItems: () => number;            // total units, e.g., 7
   getUniqueItems: () => number;           // total unique products, e.g., 3
 };
@@ -39,7 +39,7 @@ const useCartStore = create<CartState>()(
           return { items: [...state.items, { ...product, quantity: qty }] };
         }),
 
-      removeOne: (id) =>
+      removeOne: (id:string) =>
         set((state) => {
           const item = state.items.find((it) => it.id === id);
           if (!item) return { items: state.items };

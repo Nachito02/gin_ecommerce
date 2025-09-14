@@ -5,7 +5,7 @@ import { getDiscount } from "@/utils/getDiscount";
 
 const PriceSection: FC<{ price: number; discountPercentage: number}> = ({
   price,
-  discountPercentage = 0,
+  discountPercentage,
 }) => {
   const discount = parseFloat(discountPercentage.toString());
   const finalPrice = getDiscount(price, discount);
