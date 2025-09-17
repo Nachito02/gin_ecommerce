@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import WhatsappButton from "@/components/WhatsappButton";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import "../../globals.css";
+import { getCurrentUser } from "@/app/actions/getCurrentUser";
+import DashboardHeader from "@/components/headers/DashboardHeader";
 import LoginModal from "@/components/modals/LoginModal";
-import RegisterModal from "@/components/modals/RegisterModal";
-import { getCurrentUser } from "./actions/getCurrentUser";
+import useLoginModal from "@/hooks/useLoginModal";
 
-export const dynamic = 'force-dynamic'
-
+export const dynamic = "force-dynamic";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gin Muebles",
-  description: "Muebles para el hogar",
+  title: "Gin Muebles | Dashboard",
+  description: "Panel de administración",
 };
 
 export default async function RootLayout({
@@ -31,24 +28,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const currentUser = await getCurrentUser();
 
   return (
     <html lang="en">
-      <body suppressHydrationWarning
+      <body
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-
-        <Header currentUser={currentUser} />
+        <DashboardHeader currentUser={currentUser} />
+    {children}
         <LoginModal />
-        <RegisterModal />
-        {children}
-   
 
-        <WhatsappButton />
-       <Footer />
-
+    
       </body>
     </html>
   );

@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Menu, X, Search, User, ShoppingCart } from "lucide-react";
 import useLoginModal from "@/hooks/useLoginModal";
 import useCarritoStore from "@/hooks/useCarritoStore"; // Asegúrate de importar la tienda de carrito
+import Avatar from "../Avatar";
+import CartButton from "../cart/CartButton";
+import CartDropdown from "../cart/CartDropdown";
 
-import Avatar from "./Avatar";
-import CartButton from "./cart/CartButton";
-import CartDropdown from "./cart/CartDropdown";
 
 interface HeaderProps {
   currentUser : any;
