@@ -16,7 +16,9 @@ export default function DashboardHeader({ currentUser }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const loginModal = useLoginModal();
 
+
   return (
+    
     <header className="flex text-white justify-between items-center gap-5 px-9 py-4 bg-[#1f1f1f] shadow-md relative">
       <Link href="/" className="text-2xl font-bold">
         GIN Muebles | Dashboard

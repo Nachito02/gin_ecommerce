@@ -15,7 +15,7 @@ export default function CartButton({ onClick, className }: Props) {
   return (
     <button
       onClick={onClick}
-      className={`relative inline-flex items-center justify-center text-white ${className ?? ""}`}
+      className={`relative inline-flex items-center justify-center color-black ${className ?? ""}`}
       aria-label="Abrir carrito"
     >
       <ShoppingCart size={28} />
