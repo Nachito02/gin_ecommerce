@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Menu, X, Search, User, ShoppingCart } from "lucide-react";
 import useLoginModal from "@/hooks/useLoginModal";
 import useCarritoStore from "@/hooks/useCarritoStore"; // Asegúrate de importar la tienda de carrito
+import Avatar from "../Avatar";
+import CartButton from "../cart/CartButton";
+import CartDropdown from "../cart/CartDropdown";
 
-import Avatar from "./Avatar";
-import CartButton from "./cart/CartButton";
-import CartDropdown from "./cart/CartDropdown";
 
 interface HeaderProps {
   currentUser : any;
@@ -45,7 +45,7 @@ export default function Header({currentUser} : HeaderProps) {
   }, []);
 
   return (
-    <header className="flex text-white justify-between items-center gap-5 px-9 py-4 bg-[#1f1f1f] shadow-md relative">
+    <header className="flex text-white justify-between items-center gap-5 px-9 py-4 bg-[#1f1f1f] shadow-md fixed top-0 left-0 w-full z-50 md:relative">
       <Link href="/" className="text-2xl font-bold">
         GIN Muebles
       </Link>

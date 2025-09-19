@@ -9,13 +9,13 @@ export default function Footer() {
         
         {/* Logo e info */}
         <div>
-          <h2 className="text-2xl font-bold text-[#b5835a]">carpens</h2>
+          <h2 className="text-2xl font-bold text-[#b5835a]">GIN Muelbles</h2>
           <div className="mt-4 space-y-2 text-sm">
             <p className="flex items-center gap-2">
               <MdPhone /> +54 9 11 3150 4319
             </p>
             <p className="flex items-center gap-2">
-              <MdEmail /> carpensventas@gmail.com
+              <MdEmail /> ginmuebles@gmail.com
             </p>
             <div className="flex gap-3 text-xl mt-2">
               <FaWhatsapp className="cursor-pointer hover:text-[#b5835a]" />
@@ -29,7 +29,7 @@ export default function Footer() {
           <h3 className="font-bold mb-3">QUIENES SOMOS</h3>
           <ul className="space-y-2 text-sm">
             <li><a href="#">Tienda</a></li>
-            <li><a href="#">Petiribí</a></li>
+            <li><a href="#">Nosotros</a></li>
             <li><a href="#">Novedades</a></li>
             <li><a href="#">Contáctanos</a></li>
           </ul>

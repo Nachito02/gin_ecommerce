@@ -1,11 +1,10 @@
 import Banner from "@/components/Banner";
 import Features from "@/components/Features";
-import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ProductList from "@/components/ProductList";
 import { Product } from "@/models/Product";
 
-import { getProducts } from "./actions/getProducts";
+import { getProducts } from "../actions/getProducts";
 
 export default async function Home() {
 

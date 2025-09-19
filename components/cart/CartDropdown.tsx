@@ -4,10 +4,14 @@ import Link from "next/link";
 import { X, Plus, Minus, Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import useCartStore from "@/hooks/useCarritoStore"; // o "@/stores/useCartStore"
+import { Product } from "@/models/Product";
 
 function formatCurrency(n: number) {
   return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 }
+
+
+type ProductWithQuantity = Product & { quantity: number };
 
 type Props = {
   open: boolean;
@@ -65,16 +69,18 @@ export default function CartDropdown({ open, onClose, anchorRight = true }: Prop
         {items.length === 0 ? (
           <li className="px-4 py-6 text-sm text-neutral-500">El carrito está vacío</li>
         ) : (
-          items.map((it: any) => (
+          items.map((it: ProductWithQuantity) => (
             <li key={it.id} className="px-4 py-3 flex items-center gap-3">
               <img
-                src={it.thumbnail}
+                src={it.images?.[0] ?? "/images/placeholder.jpg"}
                 alt={it.title}
                 className="w-14 h-14 rounded-lg object-cover bg-neutral-100 ring-1 ring-neutral-200/60"
               />
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-medium truncate">{it.title}</div>
-                <div className="text-xs text-neutral-500 truncate">{it.category}</div>
+                <div className="text-xs text-neutral-500 truncate">
+                  {it.categories?.map((c) => c.name).join(", ")}
+                </div>
 
                 <div className="mt-2 flex items-center gap-2">
                   {/* Controles cantidad */}
