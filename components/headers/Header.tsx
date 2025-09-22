@@ -89,12 +89,12 @@ export default function Header({ currentUser }: HeaderProps) {
       )}
 
       {/* Menú lateral tipo Dior */}
-      {menuOpen && (
+      {  (
         <>
-          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setMenuOpen(false)} />
+          <div className={menuOpen ? "fixed inset-0 bg-black/50 z-40" : ""} onClick={() => setMenuOpen(false)} />
           <nav
-            className={`fixed top-6 left-6 bottom-6 w-[80%] max-w-xs bg-[#1f1f1f] shadow-lg rounded-xl z-50 flex flex-col items-start gap-6 p-6 transform transition-all duration-500 [transition-timing-function:cubic-bezier(0.77,0,0.175,1)] opacity-0 scale-95 ${
-              menuOpen ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-6 opacity-0 scale-95'
+            className={`fixed top-0 w-1/2  h-screen left-0 bottom-6 h-100vh max-w-xs bg-[#1f1f1f] shadow-lg z-50 flex flex-col items-start gap-6 p-6 transform transition-all duration-500 [transition-timing-function:cubic-bezier(0.77,0,0.175,1)] opacity-0 scale-95 ${
+              menuOpen ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-200 opacity-0 scale-95'
             }`}
           >
             <button
