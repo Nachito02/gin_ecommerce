@@ -59,15 +59,10 @@ export default function DashboardHeader({ currentUser }: HeaderProps) {
           menuOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
       >
-        <Link href="/categorias/sillas" onClick={() => setMenuOpen(false)}>
-          Sillas
+        <Link href="/dashboard/cargar-producto" onClick={() => setMenuOpen(false)}>
+         Nuevo Producto
         </Link>
-        <Link href="/categorias/mesas" onClick={() => setMenuOpen(false)}>
-          Mesas
-        </Link>
-        <Link href="/categorias/camas" onClick={() => setMenuOpen(false)}>
-          Camas
-        </Link>
+       
       </nav>
     </header>
   );

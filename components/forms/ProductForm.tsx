@@ -152,7 +152,7 @@ const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
         discountPercentage: raw.discountPercentage,
       };
 
-      const response = await axios.post("api/products", payload);
+      const response = await axios.post("http://localhost:3000/api/products", payload);
 
       reset();
       alert("Producto creado ✅");

@@ -1,6 +1,6 @@
-import { getCategories } from "@/app/actions/getCategories";
+
 import { auth } from "@/auth";
-import ProductForm from "@/components/forms/ProductForm";
+
 import { prisma } from "@/lib/prismadb";
 import { ProductStatus } from "@prisma/client";
 import {
@@ -89,9 +89,9 @@ export default async function Page() {
     redirect("/");
   }
 
-  const categories = await getCategories();
 
-  console.log(categories);
+
+ 
 
   const [products, categoriesCount, reviewsSummary] = await Promise.all([
     prisma.product.findMany({
@@ -397,7 +397,7 @@ export default async function Page() {
 
 
 
-      <ProductForm categories={categories?.categories} />
+     
     </main>
   );
 }
