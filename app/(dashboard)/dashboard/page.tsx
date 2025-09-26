@@ -1,4 +1,6 @@
+
 import { auth } from "@/auth";
+
 import { prisma } from "@/lib/prismadb";
 import { ProductStatus } from "@prisma/client";
 import {
@@ -86,6 +88,10 @@ export default async function Page() {
   if (!session?.user?.email) {
     redirect("/");
   }
+
+
+
+ 
 
   const [products, categoriesCount, reviewsSummary] = await Promise.all([
     prisma.product.findMany({
@@ -388,6 +394,10 @@ export default async function Page() {
           </div>
         </section>
       </div>
+
+
+
+     
     </main>
   );
 }
