@@ -3,9 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { getCurrentUser } from "@/app/actions/getCurrentUser";
 import DashboardHeader from "@/components/headers/DashboardHeader";
 import LoginModal from "@/components/modals/LoginModal";
-import useLoginModal from "@/hooks/useLoginModal";
-
-export const dynamic = "force-dynamic";
+import "../../globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,8 +36,6 @@ export default async function RootLayout({
         <DashboardHeader currentUser={currentUser} />
     {children}
         <LoginModal />
-
-    
       </body>
     </html>
   );

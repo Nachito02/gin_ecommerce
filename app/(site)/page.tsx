@@ -17,7 +17,7 @@ export default async function Home() {
       <HeroSection />
       <Features />
       <ProductList title="Productos destacados" products={products} />
-      <Banner />
+      {/* <Banner /> */}
 
     </div>
   );

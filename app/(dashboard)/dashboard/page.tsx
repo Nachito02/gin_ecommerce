@@ -1,5 +1,4 @@
 import { auth } from "@/auth";
-
 import { prisma } from "@/lib/prismadb";
 import { ProductStatus } from "@prisma/client";
 import {
@@ -14,13 +13,11 @@ import {
   Sparkles,
   Star,
   Tag,
-  Pencil,
-  Trash,
 } from "lucide-react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import type { ReactNode } from "react";
-
+import StatCard from "@/components/StatCard";
+import RowActions from "@/components/inputs/RowActions";
+import Image from "next/image";
 const currencyFormatter = new Intl.NumberFormat("es-AR", {
   style: "currency",
   currency: "ARS",
@@ -61,38 +58,6 @@ function formatNumber(value: number) {
   return numberFormatter.format(Math.round(value));
 }
 
-type StatCardProps = {
-  title: string;
-  value: string;
-  icon: ReactNode;
-  helper?: string;
-  accentClass?: string;
-};
-
-function StatCard({ title, value, icon, helper, accentClass }: StatCardProps) {
-  return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-neutral-200/60">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-neutral-500">{title}</p>
-          <p className="mt-2 text-2xl font-semibold text-neutral-900">
-            {value}
-          </p>
-        </div>
-        <div
-          className={`flex h-12 w-12 items-center justify-center rounded-xl ${
-            accentClass ?? "bg-carbon text-white"
-          }`}
-        >
-          {icon}
-        </div>
-      </div>
-      {helper ? (
-        <p className="mt-4 text-xs text-neutral-500">{helper}</p>
-      ) : null}
-    </div>
-  );
-}
 
 export default async function Page() {
   const session = await auth();
@@ -100,8 +65,6 @@ export default async function Page() {
   if (!session?.user?.email) {
     redirect("/");
   }
-
-
   const [products, categoriesCount, reviewsSummary] = await Promise.all([
     prisma.product.findMany({
       orderBy: { createdAt: "desc" },
@@ -275,6 +238,7 @@ export default async function Page() {
                 <table className="min-w-full divide-y divide-neutral-200/70 text-sm">
                   <thead className="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
                     <tr>
+                      <th className="px-6 py-3 font-semibold">Imagen</th>
                       <th className="px-6 py-3 font-semibold">Producto</th>
                       <th className="px-6 py-3 font-semibold">Estado</th>
                       <th className="px-6 py-3 font-semibold">Categorías</th>
@@ -295,6 +259,16 @@ export default async function Page() {
 
                       return (
                         <tr key={product.id} className="hover:bg-neutral-50/80">
+                          <td className="w-32 px-6 py-4">
+                            <Image
+                              src={product.images[0]}
+                              alt={product.title}
+                              width={32}
+                              height={32}
+                              className="h-12 w-12 rounded object-cover"
+                            />
+                          </td>
+
                           <td className="px-6 py-4">
                             <div className="font-medium text-neutral-900">
                               {product.title}
@@ -345,17 +319,7 @@ export default async function Page() {
 
                           <td className="px-6 py-4 text-right">
                             <div className="flex justify-center items-center gap-2">
-                              <Link href={`/dashboard/edit/${product.id}`}>
-                                <Pencil
-                                  color="#fe9a00"
-                                  className="h-5 w-5  cursor-pointer"
-                                />
-                              </Link>
-                              <Trash
-                              onClick={ async() => await handleDelete(product.id)}
-                                color="red"
-                                className="h-5 w-5 cursor-pointer"
-                              />
+                                <RowActions id={product.id} />
                             </div>
                           </td>
                         </tr>
