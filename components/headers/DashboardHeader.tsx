@@ -19,7 +19,7 @@ export default function DashboardHeader({ currentUser }: HeaderProps) {
 
   return (
     
-    <header className="flex text-white justify-between items-center gap-5 px-9 py-4 bg-[#1f1f1f] shadow-md relative">
+    <header className=" bg-white shadow-sm px-4 py-3 text-black font-light md:relative flex items-center justify-between">
       <Link href="/" className="text-2xl font-bold">
         GIN Muebles | Dashboard
       </Link>
@@ -45,6 +45,12 @@ export default function DashboardHeader({ currentUser }: HeaderProps) {
             autoFocus
           />
         )}
+      <Link
+  href="/dashboard/cargar-producto"
+  className="text-base md:text-lg font-medium text-gray-700 hover:text-black px-4 py-2 rounded-md transition-colors duration-200 border border-transparent hover:border-gray-300"
+>
+  Nuevo producto
+</Link>
 
         {!currentUser?.id ? (
           <User size={28} onClick={() => loginModal.onOpen()} />
@@ -55,7 +61,7 @@ export default function DashboardHeader({ currentUser }: HeaderProps) {
 
       {/* Menú móvil desplegable */}
       <nav
-        className={`absolute top-16 left-0 w-full bg-[#1f1f1f] shadow-md flex flex-col items-center gap-4 p-4 transition-all duration-300 md:hidden z-10 ${
+        className={`absolute top-16 left-0 w-full  bg-white shadow-md flex flex-col items-center gap-4 p-4 transition-all duration-300 md:hidden z-10 ${
           menuOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
       >
