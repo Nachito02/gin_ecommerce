@@ -8,7 +8,6 @@ import RegisterModal from "@/components/modals/RegisterModal";
 import { getCurrentUser } from "../actions/getCurrentUser";
 import Header from "@/components/headers/Header";
 
-export const dynamic = "force-dynamic";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

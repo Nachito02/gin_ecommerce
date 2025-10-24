@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prismadb";
 import { getCurrentUser } from "@/app/actions/getCurrentUser";
@@ -155,5 +155,51 @@ export async function POST(req: Request) {
       { error: "Internal Server Error" },
       { status: 500 }
     );
+  }
+}
+
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+
+    const deleted = await prisma.$transaction(async (tx) => {
+      await tx.productCategory.deleteMany({
+        where: { productId: id },
+      });
+
+      await tx.productVariant.deleteMany({
+        where: { productId: id },
+      });
+
+      await tx.review.deleteMany({
+        where: { productId: id },
+      });
+
+      return tx.product.delete({
+        where: { id },
+      });
+    });
+
+    return NextResponse.json(
+      { ok: true, id: deleted.id },
+      { status: 200 }
+    );
+  } catch (err: any) {
+    if (err?.code === "P2025") {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+    console.error("DELETE /api/products error:", err);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
