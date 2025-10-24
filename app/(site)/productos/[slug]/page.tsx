@@ -98,16 +98,16 @@ export default async function ProductPage(props: { params: Params }) {
               {/* tabla de detalles (ejemplo con medidas) */}
               <div className="mt-5 grid grid-cols-4 gap-x-6 gap-y-2 text-sm">
                 <div className="text-neutral-500">Ancho</div>
-                <div className="text-neutral-800">{product.widthCm ?? "-"}</div>
+                <div className="text-neutral-800">{product.widthCm  ?? "-"}cm</div>
                 <div className="text-neutral-500">Profundidad</div>
-                <div className="text-neutral-800">{product.depthCm ?? "-"}</div>
+                <div className="text-neutral-800">{product.depthCm ?? "-"}cm</div>
                 <div className="text-neutral-500">Alto</div>
                 <div className="text-neutral-800">
-                  {product.heightCm ?? "-"}
+                  {product.heightCm ?? "-"} cm
                 </div>
                 <div className="text-neutral-500">Peso</div>
                 <div className="text-neutral-800">
-                  {product.weightKg ?? "-"}
+                  {product.weightKg ?? "-"}kg
                 </div>
               </div>
             </div>

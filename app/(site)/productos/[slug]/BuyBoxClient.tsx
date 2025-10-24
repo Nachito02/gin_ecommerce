@@ -12,7 +12,7 @@ export default function BuyBoxClient({ product }: { product: Product }) {
   const addItem = useCarritoStore((s) => s.addItem);
 
   return (
-    <div className="rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200/60 p-4">
+    <div className="rounded-2xl bg-white mt-5 shadow-sm ring-1 ring-neutral-200/60 p-4">
       <div className="space-y-3">
         <div className="text-sm text-neutral-700">
           <span className="text-emerald-600 font-medium">Llega gratis</span> a tu domicilio
@@ -26,7 +26,7 @@ export default function BuyBoxClient({ product }: { product: Product }) {
         <div className="pt-2 space-y-2">
           <Button label="Comprar ahora" onClick={() => router.push("/checkout")} />
           <Button label="Agregar al carrito" onClick={() => addItem(product)} icon={AiOutlineShoppingCart} />
-          <Button label="Agregar a favoritos" onClick={() => router.push("/favoritos")} icon={MdFavoriteBorder} />
+          
         </div>
       </div>
     </div>

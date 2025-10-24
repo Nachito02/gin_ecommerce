@@ -58,7 +58,7 @@ export default function Header({ currentUser }: HeaderProps) {
         <div className="hidden md:block absolute left-1/2 -translate-x-1/2">
           <Link
             href="/"
-            className="text-2xl md:text-3xl text-white font-serif tracking-wide"
+            className="text-2xl md:text-3xl text-white font-bold tracking-wide"
           >
             GIN Muebles
           </Link>
@@ -68,7 +68,7 @@ export default function Header({ currentUser }: HeaderProps) {
         <div className="md:hidden">
           <Link
             href="/"
-            className="text-xl text-white font-serif tracking-wide"
+            className="text-xl text-white font-bold tracking-wide"
           >
             GIN Muebles
           </Link>
@@ -84,9 +84,9 @@ export default function Header({ currentUser }: HeaderProps) {
           </button>
           {!currentUser?.id ? (
             <User
-              size={18}
+              
               onClick={() => loginModal.onOpen()}
-              className="hover:text-gray-600 transition"
+              className="size-5 md:size-7 hover:text-gray-600 transition"
             />
           ) : (
             <Avatar src={currentUser.image} />
