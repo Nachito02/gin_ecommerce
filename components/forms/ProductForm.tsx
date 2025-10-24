@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { CldImage, CldUploadWidget } from "next-cloudinary";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import Button from "../Button";
@@ -22,11 +22,48 @@ const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
 
+type CategoryOption = {
+  id: string;
+  name: string;
+};
+
+type ProductCategoryLink = {
+  categoryId: string;
+  category?: { id: string };
+};
+
 interface ProductFormInterface {
-  categories: any;
+  categories: CategoryOption[];
+  mode?: "create" | "edit";
+  initialProduct?: {
+    id: string;
+    title: string;
+    slug: string;
+    description: string | null;
+    stock: number;
+    price: number;
+    materials: string[];
+    styleTags: string[];
+    roomTags: string[];
+    widthCm: number | null;
+    depthCm: number | null;
+    heightCm: number | null;
+    weightKg: number | null;
+    status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+    featured: boolean;
+    images: string[];
+    discountPercentage: number | null;
+    categories: ProductCategoryLink[];
+  };
+  onSuccess?: (product: any) => void;
 }
 
-const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
+const ProductForm: React.FC<ProductFormInterface> = ({
+  categories,
+  mode = "create",
+  initialProduct,
+  onSuccess,
+}) => {
   const [submitting, setSubmitting] = useState(false);
 
   const ProductStatusEnum = z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]);
@@ -58,6 +95,59 @@ const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
   type FormInput = z.input<typeof schema>;
   type FormOutput = z.output<typeof schema>;
 
+  const buildEmptyValues = (): FormInput => ({
+    title: "",
+    slug: "",
+    description: "",
+    stock: undefined,
+    price: undefined,
+    materials: [],
+    styleTags: [],
+    roomTags: [],
+    widthCm: undefined,
+    depthCm: undefined,
+    heightCm: undefined,
+    weightKg: undefined,
+    status: "DRAFT",
+    featured: false,
+    mainImage: "",
+    gallery: [],
+    categoryIds: [],
+    discountPercentage: undefined,
+  });
+
+  const mapProductToFormValues = (
+    product: NonNullable<ProductFormInterface["initialProduct"]>
+  ): FormInput => ({
+    title: product.title ?? "",
+    slug: product.slug ?? "",
+    description: product.description ?? "",
+    stock: product.stock ?? undefined,
+    price: product.price ?? undefined,
+    materials: product.materials ?? [],
+    styleTags: product.styleTags ?? [],
+    roomTags: product.roomTags ?? [],
+    widthCm: product.widthCm ?? undefined,
+    depthCm: product.depthCm ?? undefined,
+    heightCm: product.heightCm ?? undefined,
+    weightKg: product.weightKg ?? undefined,
+    status: product.status ?? "DRAFT",
+    featured: product.featured ?? false,
+    mainImage: product.images?.[0] ?? "",
+    gallery: product.images?.slice(1) ?? [],
+    categoryIds: (product.categories ?? [])
+      .map((c) => c.categoryId ?? c.category?.id)
+      .filter((id): id is string => Boolean(id)),
+    discountPercentage:
+      product.discountPercentage === null
+        ? undefined
+        : product.discountPercentage ?? undefined,
+  });
+
+  const defaultValues = initialProduct
+    ? mapProductToFormValues(initialProduct)
+    : buildEmptyValues();
+
   const {
     register,
     handleSubmit,
@@ -69,27 +159,16 @@ const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
   } = useForm<FormInput>({
     resolver: zodResolver(schema),
     mode: "onBlur",
-    defaultValues: {
-      title: "",
-      slug: "",
-      description: "",
-      stock: undefined,
-      price: undefined,
-      materials: [],
-      styleTags: [],
-      roomTags: [],
-      widthCm: undefined,
-      depthCm: undefined,
-      heightCm: undefined,
-      weightKg: undefined,
-      status: "DRAFT",
-      featured: false,
-      mainImage: "",
-      gallery: [],
-      categoryIds: [],
-      discountPercentage: undefined,
-    },
+    defaultValues,
   });
+
+  useEffect(() => {
+    if (mode === "edit" && initialProduct) {
+      reset(mapProductToFormValues(initialProduct));
+    } else if (mode === "create") {
+      reset(buildEmptyValues());
+    }
+  }, [initialProduct, mode, reset]);
 
   // watchers
   const title = watch("title");
@@ -101,13 +180,13 @@ const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
   // auto slug al escribir título (pero editable)
   useMemo(() => {
     if (!title) return;
-    if (!slug)
+    if (!slug) {
       setValue("slug", slugify(title), {
         shouldDirty: true,
         shouldValidate: true,
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title]);
+    }
+  }, [title, slug, setValue]);
 
   const pricePreview = useMemo(() => {
     if (!priceValue || Number.isNaN(priceValue)) return "";
@@ -124,6 +203,24 @@ const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
       setValue(field, next, { shouldDirty: true, shouldValidate: true });
 
   const selectedCats = watch("categoryIds") ?? [];
+
+  const headerBadge = mode === "edit" ? "Editar producto" : "Nuevo producto";
+  const headerTitle =
+    mode === "edit"
+      ? `Editar ${initialProduct?.title ?? "producto"}`
+      : "Crear producto";
+  const headerDescription =
+    mode === "edit"
+      ? "Actualizá la información y mantené tu catálogo al día."
+      : "Alineado a tu schema de Prisma (Product).";
+  const primaryLabel = submitting
+    ? mode === "edit"
+      ? "Guardando..."
+      : "Creando..."
+    : mode === "edit"
+    ? "Guardar cambios"
+    : "Crear producto";
+  const secondaryLabel = mode === "edit" ? "Restaurar" : "Limpiar";
 
   const onSubmit = async (raw: FormOutput) => {
     setSubmitting(true);
@@ -152,10 +249,24 @@ const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
         discountPercentage: raw.discountPercentage,
       };
 
-      const response = await axios.post("http://localhost:3000/api/products", payload);
+      const endpoint =
+        mode === "edit" && initialProduct
+          ? `/api/products/${initialProduct.id}`
+          : "/api/products";
 
-      reset();
-      alert("Producto creado ✅");
+      const response =
+        mode === "edit" && initialProduct
+          ? await axios.put(endpoint, payload)
+          : await axios.post(endpoint, payload);
+
+      if (mode === "edit") {
+        reset(mapProductToFormValues(response.data));
+        onSuccess?.(response.data);
+        alert("Producto actualizado ✅");
+      } else {
+        reset(buildEmptyValues());
+        alert("Producto creado ✅");
+      }
     } catch (e: any) {
       console.log(e);
       alert(e?.message ?? "Ocurrió un error");
@@ -170,13 +281,13 @@ const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
       <div className="mb-4">
         <span className="inline-flex items-center gap-2 rounded-full bg-white/70 ring-1 ring-black/5 px-3 py-1 text-xs text-neutral-700">
           <span className="inline-block h-2 w-2 rounded-full bg-[#840c4a]" />
-          Nuevo producto
+          {headerBadge}
         </span>
         <h2 className="mt-3 text-2xl md:text-3xl font-bold text-neutral-900">
-          Crear producto
+          {headerTitle}
         </h2>
         <p className="text-sm text-neutral-600">
-          Alineado a tu schema de Prisma (Product).
+          {headerDescription}
         </p>
       </div>
 
@@ -574,7 +685,7 @@ const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
       {/* Acciones */}
       <div className="mt-6 flex flex-col sm:flex-row gap-3">
         <Button
-          label={submitting ? "Creando..." : "Crear producto"}
+          label={primaryLabel}
           onClick={handleSubmit(onSubmit as any)}
           outline={false}
           small={false}
@@ -582,10 +693,16 @@ const ProductForm: React.FC<ProductFormInterface> = ({ categories }) => {
         />
         <button
           type="button"
-          onClick={() => reset()}
+          onClick={() => {
+            if (mode === "edit" && initialProduct) {
+              reset(mapProductToFormValues(initialProduct));
+            } else {
+              reset(buildEmptyValues());
+            }
+          }}
           className="inline-flex justify-center items-center h-11 px-5 rounded-xl bg-white/80 text-neutral-800 ring-1 ring-black/10 hover:bg-white transition"
         >
-          Limpiar
+          {secondaryLabel}
         </button>
       </div>
     </form>

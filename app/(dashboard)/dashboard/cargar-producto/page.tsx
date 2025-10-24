@@ -8,8 +8,7 @@ export default async function Page() {
   return (
     <div>
     
-       <ProductForm categories={categories?.categories} />
+       <ProductForm categories={categories?.categories ?? []} />
     </div>
   )
 }
-
