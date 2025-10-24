@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "../../globals.css";
 import { getCurrentUser } from "@/app/actions/getCurrentUser";
 import DashboardHeader from "@/components/headers/DashboardHeader";
 import LoginModal from "@/components/modals/LoginModal";
