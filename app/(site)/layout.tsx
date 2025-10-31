@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "../globals.css";
 import WhatsappButton from "@/components/WhatsappButton";
 import Footer from "@/components/Footer";
 import LoginModal from "@/components/modals/LoginModal";
 import RegisterModal from "@/components/modals/RegisterModal";
 import { getCurrentUser } from "../actions/getCurrentUser";
 import Header from "@/components/headers/Header";
+import "../globals.css";
 
 
 const geistSans = Geist({

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const HeroSection = () => {
   return (
-    <section className="relative font-lora bg-[#e7dccd]">
+    <section className="relative mt-10 md:mt-0 font-lora bg-[#e7dccd]">
       <div className="container mx-auto px-4 py-10 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Copy */}
@@ -40,7 +40,7 @@ const HeroSection = () => {
             {/* CTAs */}
             <div className="mt-7 flex flex-col sm:flex-row gap-3">
               <Link
-                href="/product/6"
+                href="/productos/silla-nordica"
                 data-test="hero-btn"
                 className="inline-flex justify-center items-center h-12 px-6 py-2 rounded-xl bg-black text-white font-medium shadow-sm hover:opacity-90 transition"
               >

@@ -58,7 +58,7 @@ export default function Header({ currentUser }: HeaderProps) {
         <div className="hidden md:block absolute left-1/2 -translate-x-1/2">
           <Link
             href="/"
-            className="text-2xl md:text-3xl text-white font-bold tracking-wide"
+            className="text-xl md:text-2xl text-white font-bold tracking-wide"
           >
             GIN Muebles
           </Link>
@@ -75,7 +75,7 @@ export default function Header({ currentUser }: HeaderProps) {
         </div>
 
         {/* Íconos a la derecha */}
-        <div className="flex gap-2 md:gap-4 items-center text-white text-sm">
+        <div className="flex gap-3 md:gap-4 items-center text-white text-sm ">
           <button
             onClick={() => setSearchOpen(!searchOpen)}
             className="hover:text-gray-600 transition"
@@ -91,12 +91,12 @@ export default function Header({ currentUser }: HeaderProps) {
           ) : (
             <Avatar src={currentUser.image} />
           )}
-          <div className="relative">
+          <div className="relative mt-2 md:mt-1">
             <CartButton
               onClick={() => setCartOpen((o) => !o)}
               className="size-5 md:size-7"
             />
-            <CartDropdown open={cartOpen} onClose={() => setCartOpen(false)} />
+            <CartDropdown open={cartOpen} onClose={() => setCartOpen(!cartOpen)} />
           </div>
         </div>
       </header>

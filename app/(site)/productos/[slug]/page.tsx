@@ -24,9 +24,9 @@ export default async function ProductPage(props: { params: Params }) {
   const thumbnails = product.images;
 
   return (
-    <div className="container mx-auto px-4 pb-28 md:pb-10 pt-6 font-karla">
+    <div className="container mx-auto px-4 pb-28 md:pb-10 mt-10 md:mt-0 pt-6 font-karla">
       {/* Migas de pan (usar Link en server está OK) */}
-      <nav className="text-sm text-neutral-500 mb-3">
+      <nav className="text-sm text-neutral-500 mb-3 mt-3 md:mt-0">
         <Link className="hover:underline" href="/">
           Inicio
         </Link>
@@ -98,9 +98,13 @@ export default async function ProductPage(props: { params: Params }) {
               {/* tabla de detalles (ejemplo con medidas) */}
               <div className="mt-5 grid grid-cols-4 gap-x-6 gap-y-2 text-sm">
                 <div className="text-neutral-500">Ancho</div>
-                <div className="text-neutral-800">{product.widthCm  ?? "-"}cm</div>
+                <div className="text-neutral-800">
+                  {product.widthCm ?? "-"}cm
+                </div>
                 <div className="text-neutral-500">Profundidad</div>
-                <div className="text-neutral-800">{product.depthCm ?? "-"}cm</div>
+                <div className="text-neutral-800">
+                  {product.depthCm ?? "-"}cm
+                </div>
                 <div className="text-neutral-500">Alto</div>
                 <div className="text-neutral-800">
                   {product.heightCm ?? "-"} cm
@@ -118,7 +122,13 @@ export default async function ProductPage(props: { params: Params }) {
 
       {/* SIMILARES */}
       <div className="mt-8">
-        <ProductList title="Productos similares" products={similar} />
+        {similar.length > 0 ? (
+          <ProductList title="Productos similares" products={similar} />
+        ) : (
+          <div className="text-sm text-neutral-500">
+           <p>No hay productos similares </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-import { FC, memo } from "react";
-import { Product, ProductVariant, Review } from "@/models/Product";
+import { FC, memo, useMemo } from "react";
 import Link from "next/link";
 import RatingStar from "./RatingStart";
 import PriceSection from "./PriceSection";
@@ -28,12 +27,17 @@ const ProductCard: React.FC<ProductCardInterface> = memo(function ProductCard({
   categories,
   rating,
 }) {
-  const hasDiscount =
-    typeof discountPercentage === "number" && discountPercentage > 0;
-  // const agregarProducto = useCarritoStore((state) => state.agregarProducto);
+  const hasDiscount = typeof discountPercentage === "number" && discountPercentage > 0;
+
+  // Imagen principal + “siguiente” del arreglo
+  const [primarySrc, hoverSrc] = useMemo(() => {
+    const first = images?.[0] ?? "/placeholder.png";
+    const next = images?.[1] ?? first; // si no hay siguiente, reutiliza la primera
+    return [first, next];
+  }, [images]);
+
   return (
-    <article
-      className="group relative rounded-2xl bg-white ring-1 ring-neutral-200/60 shadow-sm hover:shadow-md transition-shadow font-lato"
+    <article className="group relative bg-white ring-1 ring-neutral-200/60 shadow-sm hover:shadow-md transition-shadow font-lato"
       data-test="product-card"
     >
       {/* Imagen */}
@@ -42,13 +46,28 @@ const ProductCard: React.FC<ProductCardInterface> = memo(function ProductCard({
         className="block overflow-hidden rounded-t-2xl"
       >
         <div className="relative w-full aspect-[4/3] bg-neutral-50">
-          {/* Si usas next/image, reemplazá por <Image fill ... /> */}
+          {/* base */}
           <img
-            src={images[0]}
+            src={primarySrc}
             alt={title}
-            className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+            className="absolute inset-0 h-full w-full object-contain
+                       transition-transform duration-300 ease-out
+                       group-hover:scale-[1.03]"
             loading="lazy"
           />
+
+          {/* hover: siguiente del arreglo (cross-fade) */}
+          <img
+            src={hoverSrc}
+            alt={`${title} (vista 2)`}
+            className="absolute inset-0 h-full w-full object-contain
+                       opacity-0 translate-y-1
+                       transition-opacity duration-300 ease-out
+                       group-hover:opacity-100 group-hover:translate-y-0
+                       pointer-events-none"
+            loading="lazy"
+          />
+
           {hasDiscount && (
             <span className="absolute left-2 top-2 select-none rounded-md bg-[#840c4a] text-white text-xs font-semibold px-2 py-1">
               -{Math.round(discountPercentage!)}%
@@ -59,21 +78,22 @@ const ProductCard: React.FC<ProductCardInterface> = memo(function ProductCard({
 
       {/* Contenido */}
       <div className="p-3">
-        {categories?.map((category) => (
+        <div className="flex gap-0.5">
+          {categories?.map((category) => (
           <p key={category.id} className="text-xs text-neutral-500 mb-0.5">
             {category.name}
           </p>
         ))}
+        </div>
 
         <Link
-          href={{ pathname: `/productos/${id}` }}
+          href={{ pathname: `/productos/${slug}` }}
           title={title}
-          className="block text-sm font-semibold text-neutral-900 leading-snug overflow-hidden text-ellipsis whitespace-nowrap hover:underline"
+          className="block text-sm font-semibold text-neutral-900 leading-snug overflow-hidden text-ellipsis whitespace-nowrap hover:underline capitalize"
         >
           {title}
         </Link>
 
-        {/* Rating compacto */}
         {!!rating && (
           <div className="mt-1 flex items-center gap-2">
             <RatingStar rating={rating} />
@@ -83,17 +103,14 @@ const ProductCard: React.FC<ProductCardInterface> = memo(function ProductCard({
           </div>
         )}
 
-        {/* Precio + CTA */}
         <div className="mt-3 flex justify-between items-end gap-2">
-          <div className="">
+          <div>
             <PriceSection
               discountPercentage={discountPercentage ?? 0}
               price={price}
             />
-            {/* cuotas estilo ML */}
             <p className="mt-0.5 text-[11px] text-neutral-500">
-              Hasta <span className="font-medium text-neutral-700">12x</span>{" "}
-              sin interés
+              Hasta <span className="font-medium text-neutral-700">12x</span> sin interés
             </p>
           </div>
 

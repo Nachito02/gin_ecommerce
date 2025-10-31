@@ -18,7 +18,8 @@ const ProductList: FC<{ title: string; products: Product[] }> = ({
       className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4"
       data-test="product-list-container"
     >
-      {products?.map((product) => (
+   
+      {  products?.map((product) => (
         <ProductCard
           key={product.id}
           id={product.id}
@@ -31,8 +32,8 @@ const ProductList: FC<{ title: string; products: Product[] }> = ({
           slug={product.slug}
           status={product.status}
         />
-      ))}
-    </div>
+      )) }
+    </div> 
   </div>
 );
 
