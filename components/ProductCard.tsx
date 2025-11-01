@@ -3,31 +3,23 @@ import Link from "next/link";
 import RatingStar from "./RatingStart";
 import PriceSection from "./PriceSection";
 import { AiOutlineShoppingCart } from "react-icons/ai";
+import useCarritoStore from "@/hooks/useCarritoStore";
+import { Product } from "@/models/Product";
 
 interface ProductCardInterface {
-  id: string;
-  title: string;
-  slug: string;
-  price: number;
-  discountPercentage?: number;
-  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
-  featured: boolean;
-  images: string[];
-  categories?: { id: string; name: string; slug: string }[];
-  rating?: number;
+  product: Product;
+  categories: any[];
 }
 
 const ProductCard: React.FC<ProductCardInterface> = memo(function ProductCard({
-  id,
-  title,
-  slug,
-  price,
-  images,
-  discountPercentage,
-  categories,
-  rating,
+  product,
+  categories
 }) {
-  const hasDiscount = typeof discountPercentage === "number" && discountPercentage > 0;
+
+  const {discountPercentage, images, title, price, slug, status } = product;
+
+  const hasDiscount =
+    typeof discountPercentage === "number" && discountPercentage > 0;
 
   // Imagen principal + “siguiente” del arreglo
   const [primarySrc, hoverSrc] = useMemo(() => {
@@ -36,8 +28,11 @@ const ProductCard: React.FC<ProductCardInterface> = memo(function ProductCard({
     return [first, next];
   }, [images]);
 
+  const addItem = useCarritoStore((s) => s.addItem);
+
   return (
-    <article className="group relative bg-white ring-1 ring-neutral-200/60 shadow-sm hover:shadow-md transition-shadow font-lato"
+    <article
+      className="group relative bg-white ring-1 ring-neutral-200/60 shadow-sm hover:shadow-md transition-shadow font-lato"
       data-test="product-card"
     >
       {/* Imagen */}
@@ -80,10 +75,10 @@ const ProductCard: React.FC<ProductCardInterface> = memo(function ProductCard({
       <div className="p-3">
         <div className="flex gap-0.5">
           {categories?.map((category) => (
-          <p key={category.id} className="text-xs text-neutral-500 mb-0.5">
-            {category.name}
-          </p>
-        ))}
+            <p key={category.id} className="text-xs text-neutral-500 mb-0.5">
+              {category.name}
+            </p>
+          ))}
         </div>
 
         <Link
@@ -94,14 +89,7 @@ const ProductCard: React.FC<ProductCardInterface> = memo(function ProductCard({
           {title}
         </Link>
 
-        {!!rating && (
-          <div className="mt-1 flex items-center gap-2">
-            <RatingStar rating={rating} />
-            <span className="text-xs text-neutral-500">
-              {rating.toFixed(1)}
-            </span>
-          </div>
-        )}
+       
 
         <div className="mt-3 flex justify-between items-end gap-2">
           <div>
@@ -110,14 +98,15 @@ const ProductCard: React.FC<ProductCardInterface> = memo(function ProductCard({
               price={price}
             />
             <p className="mt-0.5 text-[11px] text-neutral-500">
-              Hasta <span className="font-medium text-neutral-700">12x</span> sin interés
+              Hasta <span className="font-medium text-neutral-700">12x</span>{" "}
+              sin interés
             </p>
           </div>
 
           <button
             type="button"
             className="inline-flex items-center gap-2 rounded-xl h-10 px-3 bg-black text-white text-sm font-medium hover:opacity-90 active:opacity-85 transition"
-            onClick={() => console.log({ add: id })}
+            onClick={() => addItem(product)}
             data-test="add-cart-btn"
             title="Agregar al carrito"
             aria-label="Agregar al carrito"

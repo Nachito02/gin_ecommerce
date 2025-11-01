@@ -7,6 +7,10 @@ import {
   ProductPayload,
 } from "@/lib/validation/product";
 
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
+
 async function ensureUniqueSlugForUpdate(
   base: string,
   productId: string
@@ -48,13 +52,16 @@ async function upsertProductCategories(
   });
 }
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_req: NextRequest, context: RouteContext) {
   try {
+    const params = await context.params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+
     const product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         categories: {
           include: {
@@ -79,11 +86,14 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: NextRequest, context: RouteContext) {
   try {
+    const params = await context.params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+
     const currentUser = await getCurrentUser();
     if (!currentUser?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -101,7 +111,7 @@ export async function PUT(
     const payload = parsed.data;
 
     const existingProduct = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { id: true, publishedAt: true },
     });
 
@@ -127,12 +137,12 @@ export async function PUT(
     const normalizedSlug = slugify(payload.slug);
     const uniqueSlug = await ensureUniqueSlugForUpdate(
       normalizedSlug,
-      params.id
+      id
     );
 
     const updated = await prisma.$transaction(async (tx) => {
       await tx.product.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           discountPercentage: payload.discountPercentage ?? 0,
           title: payload.title,
@@ -157,10 +167,10 @@ export async function PUT(
         },
       });
 
-      await upsertProductCategories(params.id, payload.categoryIds);
+      await upsertProductCategories(id, payload.categoryIds);
 
       return tx.product.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
           categories: {
             include: { category: true },

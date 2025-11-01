@@ -22,15 +22,8 @@ const ProductList: FC<{ title: string; products: Product[] }> = ({
       {  products?.map((product) => (
         <ProductCard
           key={product.id}
-          id={product.id}
-          images={product.images}
-          categories={product.categories}
-          title={product.title}
-          price={product.price}
-          discountPercentage={product.discountPercentage}
-          featured={product.featured}
-          slug={product.slug}
-          status={product.status}
+          product={product}
+          categories={product.categories ?? []}
         />
       )) }
     </div> 

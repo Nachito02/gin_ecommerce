@@ -9,6 +9,9 @@ export default async function Home() {
 
   const products: Product[] = await getProducts() 
 
+  console.log("products", products);
+
+
   return (
     <div className="font-sans">
       <HeroSection />

@@ -5,6 +5,7 @@ import { X, Plus, Minus, Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import useCartStore from "@/hooks/useCarritoStore"; // o "@/stores/useCartStore"
 import { Product } from "@/models/Product";
+import { getDiscount } from "@/utils/getDiscount";
 
 function formatCurrency(n: number) {
   return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
@@ -28,7 +29,11 @@ export default function CartDropdown({ open, onClose, anchorRight = true }: Prop
   const removeItem = useCartStore((s) => s.removeItem ?? ((id: number) => {}));
   const clearCart = useCartStore((s) => s.clearCart ?? (() => {}));
 
-  const total = items.reduce((sum: number, it: any) => sum + (it.price ?? 0) * (it.quantity ?? 1), 0);
+  const total = items.reduce((sum: number, it: any) => {
+    const discount = Number(it.discountPercentage ?? 0);
+    const unitPrice = getDiscount(it.price ?? 0, discount);
+    return sum + unitPrice * (it.quantity ?? 1);
+  }, 0);
 
   // cerrar al click afuera / ESC
   useEffect(() => {
@@ -69,58 +74,77 @@ export default function CartDropdown({ open, onClose, anchorRight = true }: Prop
         {items.length === 0 ? (
           <li className="px-4 py-6 text-sm text-neutral-500">El carrito está vacío</li>
         ) : (
-          items.map((it: ProductWithQuantity) => (
-            <li key={it.id} className="px-4 py-3 flex items-center gap-3">
-              <img
-                src={it.images?.[0] ?? "/images/placeholder.jpg"}
-                alt={it.title}
-                className="w-14 h-14 rounded-lg object-cover bg-neutral-100 ring-1 ring-neutral-200/60"
-              />
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium truncate">{it.title}</div>
-                <div className="text-xs text-neutral-500 truncate">
-                  {it.categories?.map((c) => c.name).join(", ")}
-                </div>
+          items.map((it: ProductWithQuantity) => {
+            const discount = Number(it.discountPercentage ?? 0);
+            const quantity = it.quantity ?? 1;
+            const hasDiscount = discount > 0;
+            const unitPrice = getDiscount(it.price ?? 0, discount);
+            const subtotal = unitPrice * quantity;
 
-                <div className="mt-2 flex items-center gap-2">
-                  {/* Controles cantidad */}
-                  <div className="inline-flex items-center rounded-lg ring-1 ring-neutral-300 overflow-hidden">
-                    <button
-                      className="h-8 w-8 grid place-items-center hover:bg-neutral-100"
-                      onClick={() => removeOne(it.id)}
-                      aria-label="Disminuir cantidad"
-                    >
-                      <Minus size={16} />
-                    </button>
-                    <span className="w-8 text-center text-sm font-medium select-none">{it.quantity ?? 1}</span>
-                    <button
-                      className="h-8 w-8 grid place-items-center hover:bg-neutral-100"
-                      onClick={() => addItem(it, 1)}
-                      aria-label="Aumentar cantidad"
-                    >
-                      <Plus size={16} />
-                    </button>
+            return (
+              <li key={it.id} className="px-4 py-3 flex items-center gap-3">
+                <img
+                  src={it.images?.[0] ?? "/images/placeholder.jpg"}
+                  alt={it.title}
+                  className="w-14 h-14 rounded-lg object-cover bg-neutral-100 ring-1 ring-neutral-200/60"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium truncate">{it.title}</div>
+                  <div className="text-xs text-neutral-500 truncate">
+                    {it.categories?.map((c) => c.name).join(", ")}
                   </div>
 
-                  {/* precio por unidad y subtotal */}
-                  <div className="ml-auto text-right">
-                    <div className="text-xs text-neutral-500">{formatCurrency(it.price ?? 0)} c/u</div>
-                    <div className="text-sm font-semibold">{formatCurrency((it.price ?? 0) * (it.quantity ?? 1))}</div>
+                  <div className="mt-2 flex items-center gap-2">
+                    {/* Controles cantidad */}
+                    <div className="inline-flex items-center rounded-lg ring-1 ring-neutral-300 overflow-hidden">
+                      <button
+                        className="h-8 w-8 grid place-items-center hover:bg-neutral-100"
+                        onClick={() => removeOne(it.id)}
+                        aria-label="Disminuir cantidad"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="w-8 text-center text-sm font-medium select-none">{it.quantity ?? 1}</span>
+                      <button
+                        className="h-8 w-8 grid place-items-center hover:bg-neutral-100"
+                        onClick={() => addItem(it, 1)}
+                        aria-label="Aumentar cantidad"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+
+                    {/* precio por unidad y subtotal */}
+                    <div className="ml-auto text-right">
+                      {hasDiscount ? (
+                        <>
+                          <div className="text-xs text-neutral-400 line-through">
+                            {formatCurrency(it.price ?? 0)} c/u
+                          </div>
+                          <div className="text-sm font-semibold text-[#840c4a]">
+                            {formatCurrency(unitPrice)} c/u (-{Math.round(discount)}%)
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-sm font-semibold">{formatCurrency(unitPrice)} c/u</div>
+                      )}
+                      <div className="text-xs text-neutral-500">Subtotal {formatCurrency(subtotal)}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* remove */}
-              <button
-                className="p-2 rounded-lg text-neutral-500 hover:text-red-600 hover:bg-red-50"
-                onClick={() => removeItem(it.id)}
-                aria-label="Quitar producto"
-                title="Quitar producto"
-              >
-                <Trash2 size={16} />
-              </button>
-            </li>
-          ))
+                {/* remove */}
+                <button
+                  className="p-2 rounded-lg text-neutral-500 hover:text-red-600 hover:bg-red-50"
+                  onClick={() => removeItem(it.id)}
+                  aria-label="Quitar producto"
+                  title="Quitar producto"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </li>
+            );
+          })
         )}
       </ul>
 

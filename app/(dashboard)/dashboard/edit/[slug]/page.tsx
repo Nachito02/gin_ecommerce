@@ -3,14 +3,16 @@ import ProductForm from "@/components/forms/ProductForm";
 import { prisma } from "@/lib/prismadb";
 import { getCategories } from "@/app/actions/getCategories";
 
-type PageProps = {
-  params: { id: string };
-};
+type Params = Promise<{ slug: string }>;
 
-export default async function Page({ params }: PageProps) {
+export default async function Page(props: { params: Params }) {
+
+  const { slug } = await props.params;
+
+
   const [product, categoriesResult] = await Promise.all([
     prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id: slug },
       include: {
         categories: {
           include: { category: true },

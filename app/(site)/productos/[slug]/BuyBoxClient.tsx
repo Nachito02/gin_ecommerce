@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
 import { AiOutlineShoppingCart } from "react-icons/ai";
-import { MdFavoriteBorder } from "react-icons/md";
 import useCarritoStore from "@/hooks/useCarritoStore";
 import { Product } from "@/models/Product";
 

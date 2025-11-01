@@ -47,7 +47,7 @@ export default function Header({ currentUser }: HeaderProps) {
             aria-label="Toggle menu"
           >
             {menuOpen ? (
-              <X size={22} className="md:size-7" />
+              <X size={22} className="md:size-7 hidden" />
             ) : (
               <Menu size={22} className="md:size-7" />
             )}
