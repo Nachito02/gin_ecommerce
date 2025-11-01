@@ -1,42 +1,10 @@
-import { NextResponse } from "next/server";
-import { z } from "zod";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prismadb";
 import { getCurrentUser } from "@/app/actions/getCurrentUser";
-
-const ProductStatusEnum = z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]);
-
-const BodySchema = z.object({
-  title: z.string().min(3),
-  slug: z.string().min(3),
-  description: z.string().optional().nullable(),
-  sku: z.string().optional().nullable(),
-  stock: z.number().positive(),
-  materials: z.array(z.string().min(1)).default([]),
-  styleTags: z.array(z.string().min(1)).default([]),
-  roomTags: z.array(z.string().min(1)).default([]),
-  price: z.number().positive(),
-  widthCm: z.number().positive().optional().nullable(),
-  depthCm: z.number().positive().optional().nullable(),
-  heightCm: z.number().positive().optional().nullable(),
-  weightKg: z.number().positive().optional().nullable(),
-  discountPercentage: z.number().optional().nullable(),
-  status: ProductStatusEnum.default("DRAFT"),
-  featured: z.boolean().default(false),
-
-  images: z.array(z.string().url()).min(1, "Se requiere al menos una imagen"),
-
-  // Conectamos por IDs (strings de ObjectId). Si preferís slugs, mirá el bloque comentado.
-  categoryIds: z.array(z.string().min(1)).default([]),
-  // categorySlugs: z.array(z.string().min(1)).default([]), // <- alternativa por slug
-});
-
-const slugify = (s: string) =>
-  s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
+import {
+  productBodySchema,
+  slugify,
+} from "@/lib/validation/product";
 
 async function ensureUniqueSlug(base: string) {
   let candidate = base;
@@ -58,7 +26,7 @@ export async function POST(req: Request) {
     }
 
     const json = await req.json();
-    const parsed = BodySchema.safeParse(json);
+    const parsed = productBodySchema.safeParse(json);
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Validation error", issues: parsed.error.flatten() },
@@ -155,5 +123,51 @@ export async function POST(req: Request) {
       { error: "Internal Server Error" },
       { status: 500 }
     );
+  }
+}
+
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+
+    const deleted = await prisma.$transaction(async (tx) => {
+      await tx.productCategory.deleteMany({
+        where: { productId: id },
+      });
+
+      await tx.productVariant.deleteMany({
+        where: { productId: id },
+      });
+
+      await tx.review.deleteMany({
+        where: { productId: id },
+      });
+
+      return tx.product.delete({
+        where: { id },
+      });
+    });
+
+    return NextResponse.json(
+      { ok: true, id: deleted.id },
+      { status: 200 }
+    );
+  } catch (err: any) {
+    if (err?.code === "P2025") {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+    console.error("DELETE /api/products error:", err);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

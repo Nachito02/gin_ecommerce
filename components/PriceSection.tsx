@@ -11,13 +11,15 @@ const PriceSection: FC<{ price: number; discountPercentage: number}> = ({
   const finalPrice = getDiscount(price, discount);
 
   if (Math.floor(discount) === 0) {
-    return <h2 className="font-medium text-blue-500 text-2xl">${price}</h2>;
+    return <h2 className="font-medium  text-2xl">${price}</h2>;
   }
+
+  console.log(finalPrice);
 
   return (
     <div className="leading-3">
-      <h2 className="font-medium text-blue-500 text-3xl">
-        ${finalPrice.toFixed(2)}
+      <h2 className="font-medium  text-3xl">
+        ${finalPrice.toFixed(0)}
       </h2>
       <span className="mr-2 text-sm line-through opacity-70  text-black">
         ${price}

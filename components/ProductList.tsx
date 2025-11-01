@@ -18,21 +18,15 @@ const ProductList: FC<{ title: string; products: Product[] }> = ({
       className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4"
       data-test="product-list-container"
     >
-      {products?.map((product) => (
+   
+      {  products?.map((product) => (
         <ProductCard
           key={product.id}
-          id={product.id}
-          images={product.images}
-          categories={product.categories}
-          title={product.title}
-          price={product.price}
-          discountPercentage={product.discountPercentage}
-          featured={product.featured}
-          slug={product.slug}
-          status={product.status}
+          product={product}
+          categories={product.categories ?? []}
         />
-      ))}
-    </div>
+      )) }
+    </div> 
   </div>
 );
 
